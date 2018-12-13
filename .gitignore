@@ -1,3 +1,6 @@
+# Gavin's additions to gitignore
+appsettings.local.json
+
 # Autosave files
 *~
 

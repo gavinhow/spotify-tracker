@@ -15,11 +15,11 @@ namespace Gavinhow.SpotifyStatistics.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             modelBuilder.HasDefaultSchema(schema: DBGlobals.SchemaName);
+
+            modelBuilder.Entity<User>().HasIndex(u => u.UserName).IsUnique();
+
             base.OnModelCreating(modelBuilder);
-
-
         }
 
         public override int SaveChanges()

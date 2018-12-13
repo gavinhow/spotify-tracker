@@ -47,7 +47,7 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<string> Authorise(string code)
+        public async Task<IActionResult> Authorise(string code)
         {
             AuthorizationCodeAuth auth = new AuthorizationCodeAuth(_clientId, _secretId, "https://localhost:5001/Login/Authorise", "https://localhost:5001",
                         Scope.UserReadCurrentlyPlaying | Scope.UserReadRecentlyPlayed);
@@ -62,19 +62,32 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
 
             PrivateProfile profile = await api.GetPrivateProfileAsync();
 
-            User user = new User
-            {
-                UserName = profile.Id,
-                AccessToken = token.AccessToken,
-                RefreshToken = token.RefreshToken,
-                ExpiresIn = token.ExpiresIn,
-                TokenCreateDate = token.CreateDate
-            };
+            User existingUser = _dbContext.Users.Where(u => u.UserName.Equals(profile.Id)).FirstOrDefault();
 
-            _dbContext.Users.Add(user);
+            if (existingUser!=null)
+            {
+                existingUser.AccessToken = token.AccessToken;
+                existingUser.RefreshToken = token.RefreshToken;
+                existingUser.TokenCreateDate = token.CreateDate;
+                existingUser.ExpiresIn = token.ExpiresIn;
+
+                _dbContext.Users.Update(existingUser);
+            }
+            else
+            {
+                User user = new User
+                {
+                    UserName = profile.Id,
+                    AccessToken = token.AccessToken,
+                    RefreshToken = token.RefreshToken,
+                    ExpiresIn = token.ExpiresIn,
+                    TokenCreateDate = token.CreateDate
+                };
+                _dbContext.Users.Add(user);
+            }
             await _dbContext.SaveChangesAsync();
 
-            return user.UserName;
+            return RedirectToAction("Index", "Home");
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Gavinhow.SpotifyStatistics.Tests
         [Fact]
         public void Test1()
         {
-
+            var dbContext = InMemoryDbContextFactory.GetDbContext();
         }
     }
 }
