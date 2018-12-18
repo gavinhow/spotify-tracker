@@ -18,16 +18,14 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
 {
     public class LoginController : Controller
     {
-        private readonly string _clientId;
-        private readonly string _secretId;
+        private readonly SpotifySettings _spotifySettings;
 
         private readonly SpotifyStatisticsContext _dbContext;
 
         public LoginController(SpotifyStatisticsContext dbContext, IOptions<SpotifySettings> spotifySettings)
         {
             _dbContext = dbContext;
-            _clientId = spotifySettings.Value.ClientId;
-            _secretId = spotifySettings.Value.ClientSecret;
+            _spotifySettings = spotifySettings.Value;
         }
 
         // GET: /<controller>/
@@ -40,8 +38,9 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
         public IActionResult Login()
         {
             AuthorizationCodeAuth auth =
-                    new AuthorizationCodeAuth(_clientId, _secretId, "https://localhost:5001/Login/Authorise", "https://localhost:5001",
-                        Scope.UserReadCurrentlyPlaying | Scope.UserReadRecentlyPlayed);
+                    new AuthorizationCodeAuth(_spotifySettings.ClientId, _spotifySettings.ClientSecret, 
+                _spotifySettings.CallbackUri, _spotifySettings.ServerUri,
+                        Scope.UserReadRecentlyPlayed);
 
             return Redirect(auth.GetUri());
         }
@@ -49,8 +48,9 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Authorise(string code)
         {
-            AuthorizationCodeAuth auth = new AuthorizationCodeAuth(_clientId, _secretId, "https://localhost:5001/Login/Authorise", "https://localhost:5001",
-                        Scope.UserReadCurrentlyPlaying | Scope.UserReadRecentlyPlayed);
+            AuthorizationCodeAuth auth = new AuthorizationCodeAuth(_spotifySettings.ClientId, _spotifySettings.ClientSecret,
+                _spotifySettings.CallbackUri, _spotifySettings.ServerUri,
+                        Scope.UserReadPrivate);
 
             Token token = await auth.ExchangeCode(code);
 
@@ -64,7 +64,7 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
 
             User existingUser = _dbContext.Users.Where(u => u.UserName.Equals(profile.Id)).FirstOrDefault();
 
-            if (existingUser!=null)
+            if ( existingUser!=null )
             {
                 existingUser.AccessToken = token.AccessToken;
                 existingUser.RefreshToken = token.RefreshToken;
