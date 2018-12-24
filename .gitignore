@@ -3,6 +3,8 @@ appsettings.local.json
 publish/
 .vscode/
 
+docker-compose.override.yml
+
 # Autosave files
 *~
 
