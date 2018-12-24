@@ -22,34 +22,27 @@ namespace Gavinhow.SpotifyStatistics.Database.Migrations
 
             modelBuilder.Entity("Gavinhow.SpotifyStatistics.Database.Entity.Play", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("TrackId");
+
+                    b.Property<DateTime>("TimeOfPlay");
+
+                    b.Property<string>("UserId");
 
                     b.Property<DateTime>("Created");
 
                     b.Property<DateTime>("Modified");
 
-                    b.Property<DateTime>("TimeOfPlay");
+                    b.HasKey("TrackId", "TimeOfPlay", "UserId");
 
-                    b.Property<string>("TrackId");
-
-                    b.Property<string>("UserId");
-
-                    b.Property<int?>("UserId1");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Plays");
                 });
 
             modelBuilder.Entity("Gavinhow.SpotifyStatistics.Database.Entity.User", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("AccessToken");
 
@@ -63,8 +56,6 @@ namespace Gavinhow.SpotifyStatistics.Database.Migrations
 
                     b.Property<DateTime>("TokenCreateDate");
 
-                    b.Property<string>("UserName");
-
                     b.HasKey("Id");
 
                     b.ToTable("Users");
@@ -74,7 +65,8 @@ namespace Gavinhow.SpotifyStatistics.Database.Migrations
                 {
                     b.HasOne("Gavinhow.SpotifyStatistics.Database.Entity.User", "User")
                         .WithMany("Plays")
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

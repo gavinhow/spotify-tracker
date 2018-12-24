@@ -2,13 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.0" />
+    <ProjectReference Include="..\Gavinhow.SpotifyStatistics.Database.Entity\Gavinhow.SpotifyStatistics.Database.Entity.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Gavinhow.SpotifyStatistics.Database.Entity\Gavinhow.SpotifyStatistics.Database.Entity.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.4" />
   </ItemGroup>
 </Project>

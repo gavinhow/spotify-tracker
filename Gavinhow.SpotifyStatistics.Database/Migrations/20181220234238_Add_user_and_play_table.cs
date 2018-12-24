@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Gavinhow.SpotifyStatistics.Database.Migrations
@@ -16,8 +15,7 @@ namespace Gavinhow.SpotifyStatistics.Database.Migrations
                 schema: "SpotifyTracker",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Id = table.Column<string>(nullable: false),
                     Created = table.Column<DateTime>(nullable: false),
                     Modified = table.Column<DateTime>(nullable: false),
                     AccessToken = table.Column<string>(nullable: true),
@@ -35,32 +33,29 @@ namespace Gavinhow.SpotifyStatistics.Database.Migrations
                 schema: "SpotifyTracker",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    TrackId = table.Column<string>(nullable: false),
+                    UserId = table.Column<string>(nullable: false),
+                    TimeOfPlay = table.Column<DateTime>(nullable: false),
                     Created = table.Column<DateTime>(nullable: false),
-                    Modified = table.Column<DateTime>(nullable: false),
-                    TrackId = table.Column<string>(nullable: true),
-                    UserId = table.Column<string>(nullable: true),
-                    UserId1 = table.Column<int>(nullable: true),
-                    TimeOfPlay = table.Column<DateTime>(nullable: false)
+                    Modified = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Plays", x => x.Id);
+                    table.PrimaryKey("PK_Plays", x => new { x.TrackId, x.TimeOfPlay, x.UserId });
                     table.ForeignKey(
-                        name: "FK_Plays_Users_UserId1",
-                        column: x => x.UserId1,
+                        name: "FK_Plays_Users_UserId",
+                        column: x => x.UserId,
                         principalSchema: "SpotifyTracker",
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Plays_UserId1",
+                name: "IX_Plays_UserId",
                 schema: "SpotifyTracker",
                 table: "Plays",
-                column: "UserId1");
+                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

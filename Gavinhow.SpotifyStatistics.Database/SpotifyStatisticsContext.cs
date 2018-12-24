@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Gavinhow.SpotifyStatistics.Database.Entity;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ namespace Gavinhow.SpotifyStatistics.Database
         {
             modelBuilder.HasDefaultSchema(schema: DBGlobals.SchemaName);
 
-            modelBuilder.Entity<User>().HasIndex(u => u.UserName).IsUnique();
+            modelBuilder.Entity<Play>().HasKey(c => new { c.TrackId, c.TimeOfPlay, c.UserId });
 
             base.OnModelCreating(modelBuilder);
         }
@@ -45,6 +46,15 @@ namespace Gavinhow.SpotifyStatistics.Database
                 }
             ((BaseEntity)entry.Entity).Modified = DateTime.UtcNow;
             }
+        }
+    }
+
+    public static class DbSetExtensions
+    {
+        public static Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<T> AddIfNotExists<T>(this DbSet<T> dbSet, T entity, Expression<Func<T, bool>> predicate = null) where T : class, new()
+        {
+            var exists = predicate != null ? dbSet.Any(predicate) : dbSet.Any();
+            return !exists ? dbSet.Add(entity) : null;
         }
     }
 }

@@ -1,5 +1,7 @@
 # Gavin's additions to gitignore
 appsettings.local.json
+publish/
+.vscode/
 
 # Autosave files
 *~

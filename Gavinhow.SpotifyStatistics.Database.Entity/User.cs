@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Gavinhow.SpotifyStatistics.Database.Entity
 {
     public class User : BaseEntity
     {
-        public string UserName { get; set; }
+        [Key]
+        public string Id { get; set; }
 
         public string AccessToken { get; set; }
 

@@ -62,7 +62,7 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
 
             PrivateProfile profile = await api.GetPrivateProfileAsync();
 
-            User existingUser = _dbContext.Users.Where(u => u.UserName.Equals(profile.Id)).FirstOrDefault();
+            User existingUser = _dbContext.Users.Where(u => u.Id.Equals(profile.Id)).FirstOrDefault();
 
             if ( existingUser!=null )
             {
@@ -77,7 +77,7 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
             {
                 User user = new User
                 {
-                    UserName = profile.Id,
+                    Id = profile.Id,
                     AccessToken = token.AccessToken,
                     RefreshToken = token.RefreshToken,
                     ExpiresIn = token.ExpiresIn,
