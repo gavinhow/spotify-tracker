@@ -1,20 +1,30 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Gavinhow.SpotifyStatistics.Web.Models;
+using Microsoft.AspNetCore.Http;
 using System;
-using SpotifyAPI.Web.Auth;
-using SpotifyAPI.Web.Enums;
-using SpotifyAPI.Web.Models;
-using SpotifyAPI.Web;
+using System.Linq;
+using Gavinhow.SpotifyStatistics.Database;
 
 namespace Gavinhow.SpotifyStatistics.Web.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly SpotifyStatisticsContext _dbContext;
+
+        public HomeController(SpotifyStatisticsContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
 
         public IActionResult Index()
         {
-            return View();
+            if (HttpContext.Session.Keys.Contains("username"))
+            {
+                return View(new HomePageModel { CurrentUser = _dbContext.Users.Find(HttpContext.Session.GetString("username")) });
+            }
+            return View(new HomePageModel());
+            //return RedirectToAction("Index", "Login");
         }
 
         public IActionResult Privacy()
@@ -28,6 +38,6 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-       
+
     }
 }

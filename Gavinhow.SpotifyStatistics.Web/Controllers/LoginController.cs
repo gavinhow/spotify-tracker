@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Gavinhow.SpotifyStatistics.Database;
 using Gavinhow.SpotifyStatistics.Database.Entity;
 using Gavinhow.SpotifyStatistics.Web.Settings;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SpotifyAPI.Web;
@@ -86,6 +85,8 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
                 _dbContext.Users.Add(user);
             }
             await _dbContext.SaveChangesAsync();
+
+            HttpContext.Session.SetString("username", profile.Id);
 
             return RedirectToAction("Index", "Home");
         }

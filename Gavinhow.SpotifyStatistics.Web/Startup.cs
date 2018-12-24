@@ -41,6 +41,9 @@ namespace Gavinhow.SpotifyStatistics.Web
 
             services.Configure<SpotifySettings>(Configuration.GetSection("Spotify"));
 
+            services.AddDistributedMemoryCache(); // Adds a default in-memory implementation of IDistributedCache
+            services.AddSession();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,6 +63,7 @@ namespace Gavinhow.SpotifyStatistics.Web
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            app.UseSession();
 
             app.UseMvc(routes =>
             {
