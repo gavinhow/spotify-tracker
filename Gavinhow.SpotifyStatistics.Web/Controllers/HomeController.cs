@@ -23,8 +23,7 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
             {
                 return View(new HomePageModel { CurrentUser = _dbContext.Users.Find(HttpContext.Session.GetString("username")) });
             }
-            return View(new HomePageModel());
-            //return RedirectToAction("Index", "Login");
+            return RedirectToAction("Index", "Login");
         }
 
         public IActionResult Privacy()

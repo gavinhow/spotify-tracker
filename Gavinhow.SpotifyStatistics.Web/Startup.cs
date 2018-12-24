@@ -41,8 +41,15 @@ namespace Gavinhow.SpotifyStatistics.Web
 
             services.Configure<SpotifySettings>(Configuration.GetSection("Spotify"));
 
-            services.AddDistributedMemoryCache(); // Adds a default in-memory implementation of IDistributedCache
-            services.AddSession();
+            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
+            {
+                // Set a short timeout for easy testing.
+                options.Cookie.Name = "SpotifyStatistics";
+                options.Cookie.IsEssential = true;
+                options.IdleTimeout = TimeSpan.FromMinutes(20);
+                options.Cookie.HttpOnly = true;
+            });
 
         }
 
