@@ -1,5 +1,5 @@
 FROM microsoft/dotnet:aspnetcore-runtime
-COPY ./publish /publish
+COPY ./ /publish
 WORKDIR /publish
 EXPOSE 80/tcp
 ENTRYPOINT ["dotnet", "Gavinhow.SpotifyStatistics.Web.dll"]

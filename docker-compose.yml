@@ -7,7 +7,7 @@ services:
         ACCEPT_EULA: "Y"
 
   web:
-    build: ./Gavinhow.SpotifyStatistics.Web
+    build: ./Gavinhow.SpotifyStatistics.Web/publish
     restart: on-failure
     depends_on:
       - db
@@ -15,7 +15,7 @@ services:
      - "8080:80"
 
   backend:
-    build: ./Gavinhow.SpotifyStatistics.Backend
+    build: ./Gavinhow.SpotifyStatistics.Backend/publish
     restart: on-failure
     depends_on:
       - db
