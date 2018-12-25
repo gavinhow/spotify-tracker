@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -34,8 +35,11 @@ namespace Gavinhow.SpotifyStatistics.Web
             Console.WriteLine("Connection: " + dbConnString);
 
             services.AddDbContext<SpotifyStatisticsContext>(options =>
-                     options.UseSqlServer(dbConnString)
-                         );
+            {
+                options.UseSqlServer(dbConnString);
+                //options.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));
+            });
+                     
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 

@@ -1,16 +1,12 @@
-﻿@model HomePageModel
+﻿@model HomeViewModel
 @{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
     <h1 class="display-4">
-        Welcome @if (Model.IsCurrentUserLoggedIn)
-        {
-            @Model.CurrentUser.Id;
-        } else {
-            <span>no user logged in</span>
-        }
+        Welcome @Model.CurrentUser.Id
     </h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <p>Oldest song on record: @Model.oldestSong.TrackId - @Model.oldestSong.TimeOfPlay</p>
+    <p>Most played song on record: @Model.mostPlayedSong.trackId - @Model.mostPlayedSong.plays</p>
 </div>

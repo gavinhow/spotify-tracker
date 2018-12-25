@@ -21,7 +21,7 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
         {
             if (HttpContext.Session.Keys.Contains("username"))
             {
-                return View(new HomePageModel { CurrentUser = _dbContext.Users.Find(HttpContext.Session.GetString("username")) });
+                return View(new HomeViewModel(_dbContext, _dbContext.Users.Find(HttpContext.Session.GetString("username"))));
             }
             return RedirectToAction("Index", "Login");
         }
