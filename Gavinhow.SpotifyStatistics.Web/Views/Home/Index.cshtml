@@ -10,6 +10,11 @@
     <h1 class="display-4">
         Welcome @Model.CurrentUser.Id
     </h1>
-    <p>Oldest song on record: @Model._oldestSong.TrackId - @Model._oldestSong.TimeOfPlay</p>
-    <p>Most played song on record: @Model._mostPlayedSong.track.Name - @Model._mostPlayedSong.plays</p>
+    @if (Model.hasPlays)
+    {
+        <p>Oldest song on record: @Model._oldestSong.TrackId - @Model._oldestSong.TimeOfPlay</p>
+        <p>Most played song on record: @Model._mostPlayedSong.track.Name - @Model._mostPlayedSong.plays</p>
+    } else {
+        <p>Start listening on spotfy and we will have some statistics for you soon</p>
+    }
 </div>

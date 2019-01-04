@@ -9,6 +9,7 @@ namespace Gavinhow.SpotifyStatistics.Web.Models
     public class HomeViewModel
     {
         public User CurrentUser { get; set; }
+        public readonly bool hasPlays;
         public readonly Play _oldestSong;
         public readonly MostPlayedSong _mostPlayedSong;
 
@@ -17,6 +18,7 @@ namespace Gavinhow.SpotifyStatistics.Web.Models
             CurrentUser = user;
             _oldestSong = oldestSong;
             _mostPlayedSong = mostPlayedSong;
+            hasPlays = (oldestSong != null);
         }
     }
 }

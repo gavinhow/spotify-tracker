@@ -27,6 +27,10 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
             if (HttpContext.Session.Keys.Contains("username"))
             {
                 string userId = HttpContext.Session.GetString("username");
+                if (_dbContext.Plays.Where(play => play.UserId == userId).Count() == 0)
+                {
+                    return View(new HomeViewModel(_dbContext.Users.Find(userId), null, null));
+                }
                 return View(new HomeViewModel(_dbContext.Users.Find(userId) ,GetOldestSong(userId), GetMostPlayedSong(userId)));
             }
             return RedirectToAction("Index", "Login");
