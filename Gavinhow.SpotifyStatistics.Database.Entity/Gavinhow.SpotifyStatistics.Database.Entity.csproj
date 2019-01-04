@@ -5,11 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="netstandard">
-      <HintPath>..\..\..\..\..\usr\local\share\dotnet\sdk\NuGetFallbackFolder\netstandard.library\2.0.3\build\netstandard2.0\ref\netstandard.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ComponentModel.Annotations">
-      <HintPath>..\..\..\..\..\usr\local\share\dotnet\sdk\NuGetFallbackFolder\system.componentmodel.annotations\4.5.0\ref\netstandard2.0\System.ComponentModel.Annotations.dll</HintPath>
-    </Reference>
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
   </ItemGroup>
 </Project>
