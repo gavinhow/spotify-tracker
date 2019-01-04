@@ -18,10 +18,10 @@
 
   <ItemGroup>
     <Folder Include="Views\Login\" />
-    <Folder Include="Settings\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Gavinhow.SpotifyStatistics.Database\Gavinhow.SpotifyStatistics.Database.csproj" />
+    <ProjectReference Include="..\Gavinhow.SpotifyStatistics.Api\Gavinhow.SpotifyStatistics.Api.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Dockerfile" />

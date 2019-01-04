@@ -1,7 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using Gavinhow.SpotifyStatistics.Backend.Settings;
+using Gavinhow.SpotifyStatistics.Api.Settings;
 using Gavinhow.SpotifyStatistics.Database;
 using Gavinhow.SpotifyStatistics.Database.Entity;
 using Microsoft.Extensions.Logging;
@@ -11,7 +10,7 @@ using SpotifyAPI.Web.Auth;
 using SpotifyAPI.Web.Enums;
 using SpotifyAPI.Web.Models;
 
-namespace Gavinhow.SpotifyStatistics.Backend
+namespace Gavinhow.SpotifyStatistics.Api
 {
     public class SpotifyApi
     {
@@ -69,7 +68,24 @@ namespace Gavinhow.SpotifyStatistics.Backend
             }
 
             dbContext.SaveChanges();
+        }
 
+        public async Task<FullTrack> GetTrackAsync(string trackId)
+        {
+            CredentialsAuth auth = new CredentialsAuth(_spotifySettings.ClientId, _spotifySettings.ClientSecret);
+            Token token = await auth.GetToken();
+            SpotifyWebAPI api = new SpotifyWebAPI() { TokenType = token.TokenType, AccessToken = token.AccessToken };
+
+            return await api.GetTrackAsync(trackId);
+        }
+
+        public FullTrack GetTrack(string trackId)
+        {
+            CredentialsAuth auth = new CredentialsAuth(_spotifySettings.ClientId, _spotifySettings.ClientSecret);
+            Token token = auth.GetToken().Result;
+            SpotifyWebAPI api = new SpotifyWebAPI() { TokenType = token.TokenType, AccessToken = token.AccessToken };
+
+            return api.GetTrack(trackId);
         }
     }
 }

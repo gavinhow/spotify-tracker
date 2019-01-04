@@ -13,11 +13,9 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Gavinhow.SpotifyStatistics.Database\Gavinhow.SpotifyStatistics.Database.csproj" />
+    <ProjectReference Include="..\Gavinhow.SpotifyStatistics.Api\Gavinhow.SpotifyStatistics.Api.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="SpotifyAPI.Web" Version="3.1.1" />
-    <PackageReference Include="SpotifyAPI.Web.Auth" Version="3.1.1" />
-    <PackageReference Include="EmbedIO" Version="1.16.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
@@ -25,8 +23,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Azure.WebJobs" Version="3.0.3" />
-    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions" Version="3.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Settings\" />

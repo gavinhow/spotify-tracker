@@ -1,50 +1,22 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Gavinhow.SpotifyStatistics.Database;
 using Gavinhow.SpotifyStatistics.Database.Entity;
+using Microsoft.AspNetCore.Http;
+using static Gavinhow.SpotifyStatistics.Web.Controllers.HomeController;
 
 namespace Gavinhow.SpotifyStatistics.Web.Models
 {
     public class HomeViewModel
     {
-        private readonly SpotifyStatisticsContext _dbContext;
-
         public User CurrentUser { get; set; }
-        public readonly Play oldestSong;
-        public readonly MostPlayedSong mostPlayedSong;
+        public readonly Play _oldestSong;
+        public readonly MostPlayedSong _mostPlayedSong;
 
-        public HomeViewModel(SpotifyStatisticsContext dbContext, User user)
+        public HomeViewModel(User user,Play oldestSong, MostPlayedSong mostPlayedSong)
         {
-            _dbContext = dbContext;
             CurrentUser = user;
-            oldestSong = GetOldestSong();
-            mostPlayedSong = GetMostPlayedSong();
-        }
-
-
-        public bool IsCurrentUserLoggedIn => (CurrentUser != null);
-
-        private Play GetOldestSong()
-        {
-            return _dbContext.Plays
-                        .Where(play => play.UserId == CurrentUser.Id)
-                        .OrderBy(play => play.TimeOfPlay).First();
-        }
-
-        private MostPlayedSong GetMostPlayedSong()
-        {
-            var mostplayedsong = _dbContext.Plays
-                        .Where(play => play.UserId == CurrentUser.Id)
-                        .GroupBy(play => play.TrackId)
-                        .OrderByDescending(gp => gp.Count()).First();
-
-            return new MostPlayedSong { trackId = mostplayedsong.Key, plays = mostplayedsong.Count() };
-        }
-
-        public class MostPlayedSong
-        {
-            public string trackId;
-            public int plays;
+            _oldestSong = oldestSong;
+            _mostPlayedSong = mostPlayedSong;
         }
     }
 }

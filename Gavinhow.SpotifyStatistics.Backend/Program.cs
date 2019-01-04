@@ -1,7 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using Gavinhow.SpotifyStatistics.Backend.Settings;
+using Gavinhow.SpotifyStatistics.Api;
+using Gavinhow.SpotifyStatistics.Api.Settings;
 using Gavinhow.SpotifyStatistics.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

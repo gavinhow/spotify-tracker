@@ -1,12 +1,12 @@
 ﻿using System;
+using Gavinhow.SpotifyStatistics.Api;
+using Gavinhow.SpotifyStatistics.Api.Settings;
 using Gavinhow.SpotifyStatistics.Database;
-using Gavinhow.SpotifyStatistics.Web.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -40,10 +40,11 @@ namespace Gavinhow.SpotifyStatistics.Web
                 //options.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));
             });
                      
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.Configure<SpotifySettings>(Configuration.GetSection("Spotify"));
+
+            services.AddTransient<SpotifyApi>();
 
             services.AddDistributedMemoryCache();
             services.AddSession(options =>

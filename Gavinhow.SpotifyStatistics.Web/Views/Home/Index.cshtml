@@ -1,4 +1,7 @@
-﻿@model HomeViewModel
+﻿@using Gavinhow.SpotifyStatistics.Api
+
+@model HomeViewModel
+@inject SpotifyApi spotifyApi
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -7,6 +10,6 @@
     <h1 class="display-4">
         Welcome @Model.CurrentUser.Id
     </h1>
-    <p>Oldest song on record: @Model.oldestSong.TrackId - @Model.oldestSong.TimeOfPlay</p>
-    <p>Most played song on record: @Model.mostPlayedSong.trackId - @Model.mostPlayedSong.plays</p>
+    <p>Oldest song on record: @Model._oldestSong.TrackId - @Model._oldestSong.TimeOfPlay</p>
+    <p>Most played song on record: @Model._mostPlayedSong.track.Name - @Model._mostPlayedSong.plays</p>
 </div>
