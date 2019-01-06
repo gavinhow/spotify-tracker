@@ -39,19 +39,18 @@ namespace Gavinhow.SpotifyStatistics.Api
             foreach (var user in dbContext.Users.ToList())
             {
                 _logger.LogDebug($"Updating recently played for {user.Id}");
-                await SaveRecentlyPlayed(await RefreshToken(user.RefreshToken));
+                await SaveRecentlyPlayed(await RefreshToken(user.RefreshToken), user.Id);
             }
             await dbContext.SaveChangesAsync();
         }
 
-        private async Task SaveRecentlyPlayed(Token token)
+        private async Task SaveRecentlyPlayed(Token token, string userId)
         {
-            var spotifyApi =  new SpotifyWebAPI()
+            var spotifyApi = new SpotifyWebAPI()
             {
                 AccessToken = token.AccessToken,
                 TokenType = token.TokenType
             };
-            PrivateProfile profile = await spotifyApi.GetPrivateProfileAsync();
             CursorPaging<PlayHistory> histories = spotifyApi.GetUsersRecentlyPlayedTracks(50);
 
             foreach (var item in histories.Items)
@@ -59,12 +58,12 @@ namespace Gavinhow.SpotifyStatistics.Api
                 Play play = new Play
                 {
                     TrackId = item.Track.Id,
-                    UserId = profile.Id,
+                    UserId = userId,
                     TimeOfPlay = item.PlayedAt
                 };
                 dbContext.Plays.AddIfNotExists(play,
                     x => x.TrackId == item.Track.Id
-                    && x.UserId == profile.Id
+                    && x.UserId == userId
                     && x.TimeOfPlay == item.PlayedAt);
             }
 
@@ -75,7 +74,7 @@ namespace Gavinhow.SpotifyStatistics.Api
         {
             CredentialsAuth auth = new CredentialsAuth(_spotifySettings.ClientId, _spotifySettings.ClientSecret);
             Token token = await auth.GetToken();
-            SpotifyWebAPI api = new SpotifyWebAPI() { TokenType = token.TokenType, AccessToken = token.AccessToken };
+            SpotifyWebAPI api = new SpotifyWebAPI { TokenType = token.TokenType, AccessToken = token.AccessToken };
 
             return await api.GetTrackAsync(trackId);
         }
@@ -84,7 +83,7 @@ namespace Gavinhow.SpotifyStatistics.Api
         {
             CredentialsAuth auth = new CredentialsAuth(_spotifySettings.ClientId, _spotifySettings.ClientSecret);
             Token token = auth.GetToken().Result;
-            SpotifyWebAPI api = new SpotifyWebAPI() { TokenType = token.TokenType, AccessToken = token.AccessToken };
+            SpotifyWebAPI api = new SpotifyWebAPI { TokenType = token.TokenType, AccessToken = token.AccessToken };
 
             return api.GetTrack(trackId);
         }
@@ -93,7 +92,7 @@ namespace Gavinhow.SpotifyStatistics.Api
         {
             CredentialsAuth auth = new CredentialsAuth(_spotifySettings.ClientId, _spotifySettings.ClientSecret);
             Token token = auth.GetToken().Result;
-            SpotifyWebAPI api = new SpotifyWebAPI() { TokenType = token.TokenType, AccessToken = token.AccessToken };
+            SpotifyWebAPI api = new SpotifyWebAPI { TokenType = token.TokenType, AccessToken = token.AccessToken };
 
             return api.GetSeveralTracks(trackIds).Tracks;
         }
