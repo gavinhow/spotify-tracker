@@ -67,12 +67,16 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
 
         private List<SongPlayCount> GetMostPlayedSongs(string userId, int numOfSongs = 10)
         {
-            return _dbContext.Plays
+            var topPlays = _dbContext.Plays
                         .Where(play => play.UserId == userId)
                         .GroupBy(play => play.TrackId)
                         .OrderByDescending(gp => gp.Count())
-                        .Take(numOfSongs)
-                        .Select(song => new SongPlayCount { track = _spotifyApi.GetTrack(song.Key), plays = song.Count() }).ToList();
+                        .Take(numOfSongs).ToList();
+
+            List<string> trackIds = topPlays.Select(topPlay => topPlay.Key).ToList();
+            List<FullTrack> tracks = _spotifyApi.GetTracks(trackIds);
+
+            return topPlays.Select(topPlay => new SongPlayCount { track = tracks.First(track => track.Id == topPlay.Key), plays = topPlay.Count() }).ToList();
         }
     }
 }

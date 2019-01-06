@@ -15,7 +15,7 @@
         <p>Oldest song on record: @Model._oldestSong.TrackId - @Model._oldestSong.TimeOfPlay</p>
         <p>Most played song on record: @Model._mostPlayedSongs[0].track.Name - @Model._mostPlayedSongs[0].plays</p>
         <div class="top-songs">
-            <h3>Top 10 most played songs</h3>
+            <h3>Top 10 most played songs <span class="hint">(since @Model._oldestSong.TimeOfPlay)</span></h3>
             <div>
                 @foreach (var song in Model._mostPlayedSongs)
                 {

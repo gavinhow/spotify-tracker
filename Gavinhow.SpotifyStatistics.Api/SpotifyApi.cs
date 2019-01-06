@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Gavinhow.SpotifyStatistics.Api.Settings;
 using Gavinhow.SpotifyStatistics.Database;
@@ -86,6 +87,15 @@ namespace Gavinhow.SpotifyStatistics.Api
             SpotifyWebAPI api = new SpotifyWebAPI() { TokenType = token.TokenType, AccessToken = token.AccessToken };
 
             return api.GetTrack(trackId);
+        }
+
+        public List<FullTrack> GetTracks(List<string> trackIds)
+        {
+            CredentialsAuth auth = new CredentialsAuth(_spotifySettings.ClientId, _spotifySettings.ClientSecret);
+            Token token = auth.GetToken().Result;
+            SpotifyWebAPI api = new SpotifyWebAPI() { TokenType = token.TokenType, AccessToken = token.AccessToken };
+
+            return api.GetSeveralTracks(trackIds).Tracks;
         }
     }
 }

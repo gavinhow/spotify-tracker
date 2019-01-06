@@ -69,3 +69,12 @@ input[type="submit"]
     background-color: #1DB954;
     padding: 20px 40px;
 }
+
+.hint {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.25;
+    display: block;
+    margin-bottom: 15px;
+    color: #6f777b;
+}
