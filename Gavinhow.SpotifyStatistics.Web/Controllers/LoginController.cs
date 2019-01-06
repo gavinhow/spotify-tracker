@@ -69,6 +69,7 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
                 existingUser.RefreshToken = token.RefreshToken;
                 existingUser.TokenCreateDate = token.CreateDate;
                 existingUser.ExpiresIn = token.ExpiresIn;
+                existingUser.DisplayName = profile.DisplayName;
 
                 _dbContext.Users.Update(existingUser);
             }
@@ -80,13 +81,14 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
                     AccessToken = token.AccessToken,
                     RefreshToken = token.RefreshToken,
                     ExpiresIn = token.ExpiresIn,
-                    TokenCreateDate = token.CreateDate
+                    TokenCreateDate = token.CreateDate,
+                    DisplayName = profile.DisplayName
                 };
                 _dbContext.Users.Add(user);
             }
             await _dbContext.SaveChangesAsync();
 
-            HttpContext.Session.SetString("username", profile.Id);
+            HttpContext.Session.SetString(SessionVariables.PROFILE_ID, profile.Id);
 
             return RedirectToAction("Index", "Home");
         }

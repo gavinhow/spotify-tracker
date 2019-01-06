@@ -13,8 +13,19 @@
     @if (Model.hasPlays)
     {
         <p>Oldest song on record: @Model._oldestSong.TrackId - @Model._oldestSong.TimeOfPlay</p>
-        <p>Most played song on record: @Model._mostPlayedSong.track.Name - @Model._mostPlayedSong.plays</p>
-    } else {
+        <p>Most played song on record: @Model._mostPlayedSongs[0].track.Name - @Model._mostPlayedSongs[0].plays</p>
+        <div class="top-songs">
+            <h3>Top 10 most played songs</h3>
+            <div>
+                @foreach (var song in Model._mostPlayedSongs)
+                {
+                    <p>@song.track.Name - @string.Join(", ", song.track.Artists.Select(artist => artist.Name)) : @song.plays</p>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
         <p>Start listening on spotfy and we will have some statistics for you soon</p>
     }
 </div>

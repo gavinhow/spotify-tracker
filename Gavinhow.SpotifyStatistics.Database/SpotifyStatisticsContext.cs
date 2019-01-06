@@ -47,6 +47,7 @@ namespace Gavinhow.SpotifyStatistics.Database
             ((BaseEntity)entry.Entity).Modified = DateTime.UtcNow;
             }
         }
+
     }
 
     public static class DbSetExtensions

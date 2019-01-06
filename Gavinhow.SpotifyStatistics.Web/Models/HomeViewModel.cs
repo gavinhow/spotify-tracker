@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Gavinhow.SpotifyStatistics.Database;
 using Gavinhow.SpotifyStatistics.Database.Entity;
 using Microsoft.AspNetCore.Http;
@@ -11,13 +12,20 @@ namespace Gavinhow.SpotifyStatistics.Web.Models
         public User CurrentUser { get; set; }
         public readonly bool hasPlays;
         public readonly Play _oldestSong;
-        public readonly MostPlayedSong _mostPlayedSong;
+        public readonly List<SongPlayCount> _mostPlayedSongs;
 
-        public HomeViewModel(User user,Play oldestSong, MostPlayedSong mostPlayedSong)
+        public HomeViewModel(User user)
+        {
+            CurrentUser = user;
+            hasPlays = false;
+        }
+
+        public HomeViewModel(User user, Play oldestSong, List<SongPlayCount> mostPlayedSongs)
         {
             CurrentUser = user;
             _oldestSong = oldestSong;
-            _mostPlayedSong = mostPlayedSong;
+            _mostPlayedSongs = mostPlayedSongs;
+
             hasPlays = (oldestSong != null);
         }
     }
