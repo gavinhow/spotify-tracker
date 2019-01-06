@@ -8,7 +8,7 @@
 
 <div class="text-center">
     <h1 class="display-4">
-        Welcome @Model.CurrentUser.Id
+        Welcome @(Model.CurrentUser.DisplayName ?? Model.CurrentUser.Id)
     </h1>
     @if (Model.hasPlays)
     {
