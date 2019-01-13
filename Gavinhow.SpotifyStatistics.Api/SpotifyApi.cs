@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Gavinhow.SpotifyStatistics.Api.Models;
 using Gavinhow.SpotifyStatistics.Api.Settings;
 using Gavinhow.SpotifyStatistics.Database;
 using Gavinhow.SpotifyStatistics.Database.Entity;
@@ -17,13 +18,13 @@ namespace Gavinhow.SpotifyStatistics.Api
     {
         private readonly SpotifySettings _spotifySettings;
         private readonly ILogger _logger;
-        private SpotifyStatisticsContext dbContext;
+        private SpotifyStatisticsContext _dbContext;
 
         public SpotifyApi(IOptions<SpotifySettings> spotifySettings, ILogger<SpotifyApi> logger, SpotifyStatisticsContext dbContext)
         {
             _logger = logger;
             _spotifySettings = spotifySettings.Value;
-            this.dbContext = dbContext;
+            this._dbContext = dbContext;
         }
 
         public async Task<Token> RefreshToken(string refreshToken)
@@ -36,12 +37,12 @@ namespace Gavinhow.SpotifyStatistics.Api
 
         public async Task UpdateAllUsers()
         {
-            foreach (var user in dbContext.Users.ToList())
+            foreach (var user in _dbContext.Users.ToList())
             {
                 _logger.LogDebug($"Updating recently played for {user.Id}");
                 await SaveRecentlyPlayed(await RefreshToken(user.RefreshToken), user.Id);
             }
-            await dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
         }
 
         private async Task SaveRecentlyPlayed(Token token, string userId)
@@ -61,13 +62,13 @@ namespace Gavinhow.SpotifyStatistics.Api
                     UserId = userId,
                     TimeOfPlay = item.PlayedAt
                 };
-                dbContext.Plays.AddIfNotExists(play,
+                _dbContext.Plays.AddIfNotExists(play,
                     x => x.TrackId == item.Track.Id
                     && x.UserId == userId
                     && x.TimeOfPlay == item.PlayedAt);
             }
 
-            dbContext.SaveChanges();
+            _dbContext.SaveChanges();
         }
 
         public async Task<FullTrack> GetTrackAsync(string trackId)
@@ -95,6 +96,37 @@ namespace Gavinhow.SpotifyStatistics.Api
             SpotifyWebAPI api = new SpotifyWebAPI { TokenType = token.TokenType, AccessToken = token.AccessToken };
 
             return api.GetSeveralTracks(trackIds).Tracks;
+        }
+
+        public Play GetOldestSong(string userId)
+        {
+            return _dbContext.Plays
+                        .Where(play => play.UserId == userId)
+                        .OrderBy(play => play.TimeOfPlay).First();
+        }
+
+        public SongPlayCount GetMostPlayedSong(string userId)
+        {
+            var mostplayedsong = _dbContext.Plays
+                        .Where(play => play.UserId == userId)
+                        .GroupBy(play => play.TrackId)
+                        .OrderByDescending(gp => gp.Count()).First();
+
+            return new SongPlayCount { track = this.GetTrack(mostplayedsong.Key), plays = mostplayedsong.Count() };
+        }
+
+        public List<SongPlayCount> GetMostPlayedSongs(string userId, int numOfSongs = 10)
+        {
+            var topPlays = _dbContext.Plays
+                        .Where(play => play.UserId == userId)
+                        .GroupBy(play => play.TrackId)
+                        .OrderByDescending(gp => gp.Count())
+                        .Take(numOfSongs).ToList();
+
+            List<string> trackIds = topPlays.Select(topPlay => topPlay.Key).ToList();
+            List<FullTrack> tracks = this.GetTracks(trackIds);
+
+            return topPlays.Select(topPlay => new SongPlayCount { track = tracks.First(track => track.Id == topPlay.Key), plays = topPlay.Count() }).ToList();
         }
     }
 }

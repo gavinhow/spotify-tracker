@@ -1,7 +1,7 @@
 ﻿using System;
 using SpotifyAPI.Web.Models;
 
-namespace Gavinhow.SpotifyStatistics.Web.Models
+namespace Gavinhow.SpotifyStatistics.Api.Models
 {
     public class SongPlayCount
     {

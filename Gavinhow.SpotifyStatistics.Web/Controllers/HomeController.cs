@@ -23,16 +23,20 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
             _spotifyApi = spotifyApi;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string id = null)
         {
             if (HttpContext.Session.Keys.Contains(SessionVariables.PROFILE_ID))
             {
                 string userId = HttpContext.Session.GetString(SessionVariables.PROFILE_ID);
-                if (_dbContext.Plays.Where(play => play.UserId == userId).Count() == 0)
+                if (userId != "gavinhow" || id == null)
                 {
-                    return View(new HomeViewModel(_dbContext.Users.Find(userId)));
+                    id = userId;
                 }
-                return View(new HomeViewModel(_dbContext.Users.Find(userId), GetOldestSong(userId), GetMostPlayedSongs(userId)));
+                if (_dbContext.Plays.Where(play => play.UserId == id).Count() == 0)
+                {
+                    return View(new HomeViewModel(_dbContext.Users.Find(id)));
+                }
+                return View(new HomeViewModel(_dbContext.Users.Find(id), _spotifyApi.GetOldestSong(id), _spotifyApi.GetMostPlayedSongs(id)));
             }
             return RedirectToAction("Index", "Login");
         }
@@ -48,35 +52,6 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        private SongPlayCount GetMostPlayedSong(string userId)
-        {
-            var mostplayedsong = _dbContext.Plays
-                        .Where(play => play.UserId == userId)
-                        .GroupBy(play => play.TrackId)
-                        .OrderByDescending(gp => gp.Count()).First();
 
-            return new SongPlayCount { track = _spotifyApi.GetTrack(mostplayedsong.Key), plays = mostplayedsong.Count() };
-        }
-
-        private Play GetOldestSong(string userId)
-        {
-            return _dbContext.Plays
-                        .Where(play => play.UserId == userId)
-                        .OrderBy(play => play.TimeOfPlay).First();
-        }
-
-        private List<SongPlayCount> GetMostPlayedSongs(string userId, int numOfSongs = 10)
-        {
-            var topPlays = _dbContext.Plays
-                        .Where(play => play.UserId == userId)
-                        .GroupBy(play => play.TrackId)
-                        .OrderByDescending(gp => gp.Count())
-                        .Take(numOfSongs).ToList();
-
-            List<string> trackIds = topPlays.Select(topPlay => topPlay.Key).ToList();
-            List<FullTrack> tracks = _spotifyApi.GetTracks(trackIds);
-
-            return topPlays.Select(topPlay => new SongPlayCount { track = tracks.First(track => track.Id == topPlay.Key), plays = topPlay.Count() }).ToList();
-        }
     }
 }

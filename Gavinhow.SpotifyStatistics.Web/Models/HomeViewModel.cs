@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Gavinhow.SpotifyStatistics.Api.Models;
 using Gavinhow.SpotifyStatistics.Database;
 using Gavinhow.SpotifyStatistics.Database.Entity;
 using Microsoft.AspNetCore.Http;

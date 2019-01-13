@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Folder Include="Settings\" />
+    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="SpotifyAPI.Web" Version="3.1.1" />
