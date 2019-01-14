@@ -39,8 +39,17 @@ namespace Gavinhow.SpotifyStatistics.Api
         {
             foreach (var user in _dbContext.Users.ToList())
             {
-                _logger.LogDebug($"Updating recently played for {user.Id}");
-                await SaveRecentlyPlayed(await RefreshToken(user.RefreshToken), user.Id);
+                try
+                {
+                    _logger.LogDebug($"Updating recently played for {user.Id}");
+                    await SaveRecentlyPlayed(await RefreshToken(user.RefreshToken), user.Id);
+                }
+                catch (System.Exception ex)
+                {
+                    _logger.LogError($"Error when trying to update {user.Id}");
+                    _logger.LogError($"{ex.Message}\n{ex.StackTrace}");
+                }
+               
             }
             await _dbContext.SaveChangesAsync();
         }
