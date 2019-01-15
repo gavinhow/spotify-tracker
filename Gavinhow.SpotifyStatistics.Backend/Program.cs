@@ -29,7 +29,7 @@ namespace Gavinhow.SpotifyStatistics.Backend
                 .SetBasePath(Path.Combine(AppContext.BaseDirectory))
                 .AddEnvironmentVariables()
                 .AddJsonFile("appsettings.json", optional: false)
-                .AddJsonFile("appsettings.local.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
                 .AddApplicationInsightsSettings();
 
             Configuration = builder.Build();
