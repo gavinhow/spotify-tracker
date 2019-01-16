@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <Folder Include="Views\Login\" />
-    <Folder Include="New Folder\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Gavinhow.SpotifyStatistics.Database\Gavinhow.SpotifyStatistics.Database.csproj" />

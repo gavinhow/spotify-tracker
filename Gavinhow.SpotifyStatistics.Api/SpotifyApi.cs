@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Gavinhow.SpotifyStatistics.Api.Models;
@@ -41,7 +42,7 @@ namespace Gavinhow.SpotifyStatistics.Api
             {
                 try
                 {
-                    _logger.LogDebug($"Updating recently played for {user.Id}");
+                    _logger.LogInformation($"Updating recently played for {user.Id}");
                     await SaveRecentlyPlayed(await RefreshToken(user.RefreshToken), user.Id);
                 }
                 catch (System.Exception ex)
