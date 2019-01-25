@@ -1,7 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-
-namespace Gavinhow.SpotifyStatistics.Database.Entity
+﻿namespace Gavinhow.SpotifyStatistics.Database.Entity
 {
     public class ArtistTrack : BaseEntity
     {
