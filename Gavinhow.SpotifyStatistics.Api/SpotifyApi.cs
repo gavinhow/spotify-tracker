@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Gavinhow.SpotifyStatistics.Api.Models;
@@ -41,15 +42,15 @@ namespace Gavinhow.SpotifyStatistics.Api
             {
                 try
                 {
-                    _logger.LogDebug($"Updating recently played for {user.Id}");
+                    _logger.LogInformation($"Updating recently played for {user.Id}");
                     await SaveRecentlyPlayed(await RefreshToken(user.RefreshToken), user.Id);
                 }
-                catch (System.Exception ex)
+                catch (Exception ex)
                 {
                     _logger.LogError($"Error when trying to update {user.Id}");
                     _logger.LogError($"{ex.Message}\n{ex.StackTrace}");
                 }
-               
+
             }
             await _dbContext.SaveChangesAsync();
         }
@@ -61,7 +62,8 @@ namespace Gavinhow.SpotifyStatistics.Api
                 AccessToken = token.AccessToken,
                 TokenType = token.TokenType
             };
-            CursorPaging<PlayHistory> histories = spotifyApi.GetUsersRecentlyPlayedTracks(50);
+            CursorPaging<PlayHistory> histories = await spotifyApi.GetUsersRecentlyPlayedTracksAsync(50);
+            SeveralTracks severalTracks = await spotifyApi.GetSeveralTracksAsync(histories.Items.Select(item => item.Track.Id).ToList());
 
             foreach (var item in histories.Items)
             {
@@ -71,6 +73,7 @@ namespace Gavinhow.SpotifyStatistics.Api
                     UserId = userId,
                     TimeOfPlay = item.PlayedAt
                 };
+
                 _dbContext.Plays.AddIfNotExists(play,
                     x => x.TrackId == item.Track.Id
                     && x.UserId == userId
@@ -78,6 +81,78 @@ namespace Gavinhow.SpotifyStatistics.Api
             }
 
             _dbContext.SaveChanges();
+            
+            foreach (var item in severalTracks.Tracks)
+            {
+                if (_dbContext.Tracks.Any(obj => obj.Id == item.Id))
+                {
+                    continue;
+                }
+                SaveTrackInformation(item);
+                _dbContext.SaveChanges();
+            }
+
+            var result = from play in _dbContext.Plays
+                         join track in _dbContext.Tracks on play.TrackId equals track.Id into combined
+                         from test in combined.DefaultIfEmpty()
+                         where test.Id == null
+                         select play.TrackId;
+
+            List<string> trackIdsWithoutLocalDetails = result.ToList();
+            for (int i = 0; i < trackIdsWithoutLocalDetails.Count; i+=50)
+            {
+               
+                SeveralTracks tracksWithoutLocalDetails = await spotifyApi.GetSeveralTracksAsync(trackIdsWithoutLocalDetails.Skip(i).Take(50).ToList());
+
+                _logger.LogWarning($"HELLO GAVIN2 {tracksWithoutLocalDetails.Tracks.Count}");
+
+                foreach (var item in tracksWithoutLocalDetails.Tracks)
+                {
+                    if (_dbContext.Tracks.Any(obj => obj.Id == item.Id))
+                    {
+                        continue;
+                    }
+                    SaveTrackInformation(item);
+                    _dbContext.SaveChanges();
+                }
+            }
+           
+
+        }
+
+        private void SaveTrackInformation(FullTrack item)
+        {
+            Track track = new Track
+            {
+                Id = item.Id,
+                AlbumId = item.Album.Id
+            };
+
+            _dbContext.Tracks.AddIfNotExists(track,
+                x => x.Id == item.Id);
+            foreach (var artist in item.Artists)
+            {
+                ArtistTrack artistTrack = new ArtistTrack
+                {
+                    TrackId = item.Id,
+                    ArtistId = artist.Id
+                };
+                _dbContext.ArtistTracks.AddIfNotExists(artistTrack,
+                    x => x.ArtistId == artistTrack.ArtistId
+                    && x.TrackId == artistTrack.TrackId);
+            }
+
+            foreach (var artist in item.Album.Artists)
+            {
+                ArtistAlbum artistAlbum = new ArtistAlbum
+                {
+                    ArtistId = artist.Id,
+                    AlbumId = item.Album.Id
+                };
+                _dbContext.ArtistAlbums.AddIfNotExists(artistAlbum,
+                    x => x.AlbumId == artistAlbum.AlbumId
+                    && x.ArtistId == artistAlbum.ArtistId);
+            }
         }
 
         public async Task<FullTrack> GetTrackAsync(string trackId)

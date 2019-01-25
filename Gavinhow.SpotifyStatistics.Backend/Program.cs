@@ -5,14 +5,11 @@ using Gavinhow.SpotifyStatistics.Api;
 using Gavinhow.SpotifyStatistics.Api.Settings;
 using Gavinhow.SpotifyStatistics.Backend.Settings;
 using Gavinhow.SpotifyStatistics.Database;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Gavinhow.SpotifyStatistics.Backend
 {

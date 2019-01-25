@@ -13,12 +13,18 @@ namespace Gavinhow.SpotifyStatistics.Database
 
         public DbSet<User> Users { get; set; }
         public DbSet<Play> Plays { get; set; }
+        public DbSet<Track> Tracks { get; set; }
+        public DbSet<ArtistAlbum> ArtistAlbums { get; set; }
+        public DbSet<ArtistTrack> ArtistTracks { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema(schema: DBGlobals.SchemaName);
 
             modelBuilder.Entity<Play>().HasKey(c => new { c.TrackId, c.TimeOfPlay, c.UserId });
+            modelBuilder.Entity<ArtistAlbum>().HasKey(c => new { c.AlbumId, c.ArtistId });
+            modelBuilder.Entity<ArtistTrack>().HasKey(c => new { c.ArtistId, c.TrackId });
 
             base.OnModelCreating(modelBuilder);
         }
