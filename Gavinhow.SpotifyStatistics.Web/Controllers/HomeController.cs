@@ -28,6 +28,7 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
             if (HttpContext.Session.Keys.Contains(SessionVariables.PROFILE_ID))
             {
                 string userId = HttpContext.Session.GetString(SessionVariables.PROFILE_ID);
+
                 if (userId != "gavinhow" || id == null)
                 {
                     id = userId;
@@ -36,7 +37,8 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
                 {
                     return View(new HomeViewModel(_dbContext.Users.Find(id)));
                 }
-                return View(new HomeViewModel(_dbContext.Users.Find(id), _spotifyApi.GetOldestSong(id), _spotifyApi.GetMostPlayedSongs(id)));
+
+                return View(new HomeViewModel(_dbContext.Users.Find(id), _spotifyApi.GetOldestSong(id), _spotifyApi.GetMostPlayedSongs(id), _spotifyApi.GetTopPlayedArtist(id)));
             }
             return RedirectToAction("Index", "Login");
         }

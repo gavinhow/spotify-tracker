@@ -14,13 +14,24 @@
     {
         <p>Oldest song on record: @Model._oldestSong.TrackId - @Model._oldestSong.TimeOfPlay</p>
         <p>Most played song on record: @Model._mostPlayedSongs[0].track.Name - @Model._mostPlayedSongs[0].plays</p>
-        <div class="top-songs">
-            <h3>Top 10 most played songs <span class="hint">(since @Model._oldestSong.TimeOfPlay)</span></h3>
-            <div>
-                @foreach (var song in Model._mostPlayedSongs)
-                {
-                    <p>@song.track.Name - @string.Join(", ", song.track.Artists.Select(artist => artist.Name)) : @song.plays</p>
-                }
+        <div>
+            <div class="top-songs">
+                <h3>Top 10 most played songs <span class="hint">(since @Model._oldestSong.TimeOfPlay)</span></h3>
+                <div>
+                    @foreach (var song in Model._mostPlayedSongs)
+                    {
+                        <p>@song.track.Name - @string.Join(", ", song.track.Artists.Select(artist => artist.Name)) : @song.plays</p>
+                    }
+                </div>
+            </div>
+            <div class=top-artists>
+                <h3>Top 10 most played artists</h3>
+                <div>
+                    @foreach (var artist in Model._mostPlayedArtists)
+                    {
+                        <p>@artist.artist.Name : @artist.plays</p>
+                    }
+                </div>
             </div>
         </div>
     }

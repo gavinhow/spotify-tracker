@@ -81,7 +81,7 @@ namespace Gavinhow.SpotifyStatistics.Api
             }
 
             _dbContext.SaveChanges();
-            
+
             foreach (var item in severalTracks.Tracks)
             {
                 if (_dbContext.Tracks.Any(obj => obj.Id == item.Id))
@@ -99,12 +99,9 @@ namespace Gavinhow.SpotifyStatistics.Api
                          select play.TrackId;
 
             List<string> trackIdsWithoutLocalDetails = result.ToList();
-            for (int i = 0; i < trackIdsWithoutLocalDetails.Count; i+=50)
+            for (int i = 0; i < trackIdsWithoutLocalDetails.Count; i += 50)
             {
-               
                 SeveralTracks tracksWithoutLocalDetails = await spotifyApi.GetSeveralTracksAsync(trackIdsWithoutLocalDetails.Skip(i).Take(50).ToList());
-
-                _logger.LogWarning($"HELLO GAVIN2 {tracksWithoutLocalDetails.Tracks.Count}");
 
                 foreach (var item in tracksWithoutLocalDetails.Tracks)
                 {
@@ -116,7 +113,7 @@ namespace Gavinhow.SpotifyStatistics.Api
                     _dbContext.SaveChanges();
                 }
             }
-           
+
 
         }
 
@@ -182,6 +179,15 @@ namespace Gavinhow.SpotifyStatistics.Api
             return api.GetSeveralTracks(trackIds).Tracks;
         }
 
+        public List<FullArtist> GetArtists(List<string> artistIds)
+        {
+            CredentialsAuth auth = new CredentialsAuth(_spotifySettings.ClientId, _spotifySettings.ClientSecret);
+            Token token = auth.GetToken().Result;
+            SpotifyWebAPI api = new SpotifyWebAPI { TokenType = token.TokenType, AccessToken = token.AccessToken };
+
+            return api.GetSeveralArtists(artistIds).Artists;
+        }
+
         public Play GetOldestSong(string userId)
         {
             return _dbContext.Plays
@@ -211,6 +217,22 @@ namespace Gavinhow.SpotifyStatistics.Api
             List<FullTrack> tracks = this.GetTracks(trackIds);
 
             return topPlays.Select(topPlay => new SongPlayCount { track = tracks.First(track => track.Id == topPlay.Key), plays = topPlay.Count() }).ToList();
+        }
+
+        public List<ArtistPlayCount> GetTopPlayedArtist(string userId, int numOfArtists = 10)
+        {
+            var topArtists = from artistTrack in _dbContext.ArtistTracks
+                             join plays in _dbContext.Plays on artistTrack.TrackId equals plays.TrackId into j1
+                             from j2 in j1.DefaultIfEmpty()
+                             where j2.UserId == userId
+                             group j2 by artistTrack.ArtistId into grouped
+                             orderby grouped.Count() descending
+                             select new { ArtistId = grouped.Key, Count = grouped.Count() };
+
+            List<string> artistIds = topArtists.Take(numOfArtists).Select(topArtist => topArtist.ArtistId).ToList();
+            List<FullArtist> artists = this.GetArtists(artistIds);
+            _logger.LogWarning(artists.Count().ToString());
+            return topArtists.Take(numOfArtists).Select(topArtist => new ArtistPlayCount { artist = artists.First(artist => artist.Id == topArtist.ArtistId), plays = topArtist.Count }).ToList();
         }
     }
 }
