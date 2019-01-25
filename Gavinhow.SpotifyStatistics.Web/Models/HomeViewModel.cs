@@ -4,6 +4,7 @@ using Gavinhow.SpotifyStatistics.Api.Models;
 using Gavinhow.SpotifyStatistics.Database;
 using Gavinhow.SpotifyStatistics.Database.Entity;
 using Microsoft.AspNetCore.Http;
+using SpotifyAPI.Web.Models;
 using static Gavinhow.SpotifyStatistics.Web.Controllers.HomeController;
 
 namespace Gavinhow.SpotifyStatistics.Web.Models
@@ -14,6 +15,7 @@ namespace Gavinhow.SpotifyStatistics.Web.Models
         public readonly bool hasPlays;
         public readonly Play _oldestSong;
         public readonly List<SongPlayCount> _mostPlayedSongs;
+        public readonly List<ArtistPlayCount> _mostPlayedArtists;
 
         public HomeViewModel(User user)
         {
@@ -21,11 +23,12 @@ namespace Gavinhow.SpotifyStatistics.Web.Models
             hasPlays = false;
         }
 
-        public HomeViewModel(User user, Play oldestSong, List<SongPlayCount> mostPlayedSongs)
+        public HomeViewModel(User user, Play oldestSong, List<SongPlayCount> mostPlayedSongs, List<ArtistPlayCount> mostPlayedArtists)
         {
             CurrentUser = user;
             _oldestSong = oldestSong;
             _mostPlayedSongs = mostPlayedSongs;
+            _mostPlayedArtists = mostPlayedArtists;
 
             hasPlays = (oldestSong != null);
         }
