@@ -38,7 +38,11 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
                     return View(new HomeViewModel(_dbContext.Users.Find(id)));
                 }
 
-                return View(new HomeViewModel(_dbContext.Users.Find(id), _spotifyApi.GetOldestSong(id), _spotifyApi.GetMostPlayedSongs(id), _spotifyApi.GetTopPlayedArtist(id)));
+                var today = DateTime.Today;
+                var month = new DateTime(today.Year, today.Month, 1);
+                var first = month.AddMonths(-1);
+                var last = month.AddDays(-1);
+                return View(new HomeViewModel(_dbContext.Users.Find(id), _spotifyApi.GetOldestSong(id), _spotifyApi.GetMostPlayedSongs(id), _spotifyApi.GetTopPlayedArtist(id), _spotifyApi.GetMostPlayedSongs(id, first, last)));
             }
             return RedirectToAction("Index", "Login");
         }

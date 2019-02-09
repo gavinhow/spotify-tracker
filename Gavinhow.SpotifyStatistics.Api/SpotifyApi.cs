@@ -219,6 +219,20 @@ namespace Gavinhow.SpotifyStatistics.Api
             return topPlays.Select(topPlay => new SongPlayCount { track = tracks.First(track => track.Id == topPlay.Key), plays = topPlay.Count() }).ToList();
         }
 
+        public List<SongPlayCount> GetMostPlayedSongs(string userId, DateTime startDate, DateTime endDate, int numOfSongs = 10)
+        {
+            var topPlays = _dbContext.Plays
+                        .Where(play => play.UserId == userId && play.TimeOfPlay > startDate && play.TimeOfPlay < endDate) 
+                        .GroupBy(play => play.TrackId)
+                        .OrderByDescending(gp => gp.Count())
+                        .Take(numOfSongs).ToList();
+           
+             List<string> trackIds = topPlays.Select(topPlay => topPlay.Key).ToList();
+            List<FullTrack> tracks = this.GetTracks(trackIds);
+
+            return topPlays.Select(topPlay => new SongPlayCount { track = tracks.First(track => track.Id == topPlay.Key), plays = topPlay.Count() }).ToList();
+        }
+
         public List<ArtistPlayCount> GetTopPlayedArtist(string userId, int numOfArtists = 10)
         {
             var topArtists = from artistTrack in _dbContext.ArtistTracks

@@ -15,6 +15,7 @@ namespace Gavinhow.SpotifyStatistics.Web.Models
         public readonly bool hasPlays;
         public readonly Play _oldestSong;
         public readonly List<SongPlayCount> _mostPlayedSongs;
+        public readonly List<SongPlayCount> _lastMonthMostPlayedSongs;
         public readonly List<ArtistPlayCount> _mostPlayedArtists;
 
         public HomeViewModel(User user)
@@ -23,12 +24,13 @@ namespace Gavinhow.SpotifyStatistics.Web.Models
             hasPlays = false;
         }
 
-        public HomeViewModel(User user, Play oldestSong, List<SongPlayCount> mostPlayedSongs, List<ArtistPlayCount> mostPlayedArtists)
+        public HomeViewModel(User user, Play oldestSong, List<SongPlayCount> mostPlayedSongs, List<ArtistPlayCount> mostPlayedArtists, List<SongPlayCount> lastMonthPlayed)
         {
             CurrentUser = user;
             _oldestSong = oldestSong;
             _mostPlayedSongs = mostPlayedSongs;
             _mostPlayedArtists = mostPlayedArtists;
+            _lastMonthMostPlayedSongs = lastMonthPlayed;
 
             hasPlays = (oldestSong != null);
         }

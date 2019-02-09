@@ -33,6 +33,15 @@
                     }
                 </div>
             </div>
+            <div class="top-songs">
+                <h3>Top 10 most played songs last month</h3>
+                <div>
+                    @foreach (var song in Model._lastMonthMostPlayedSongs)
+                    {
+                        <p>@song.track.Name - @string.Join(", ", song.track.Artists.Select(artist => artist.Name)) : @song.plays</p>
+                    }
+                </div>
+            </div>
         </div>
     }
     else
