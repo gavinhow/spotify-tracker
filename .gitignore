@@ -2,6 +2,7 @@
 appsettings.local.json
 publish/
 .vscode/
+.idea/
 
 docker-compose.override.yml
 
