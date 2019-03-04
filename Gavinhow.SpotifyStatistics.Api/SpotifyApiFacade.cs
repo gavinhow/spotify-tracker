@@ -15,13 +15,13 @@ using SpotifyAPI.Web.Models;
 
 namespace Gavinhow.SpotifyStatistics.Api
 {
-    public class SpotifyApi
+    public class SpotifyApiFacade
     {
         private readonly SpotifySettings _spotifySettings;
         private readonly ILogger _logger;
         private SpotifyStatisticsContext _dbContext;
 
-        public SpotifyApi(IOptions<SpotifySettings> spotifySettings, ILogger<SpotifyApi> logger, SpotifyStatisticsContext dbContext)
+        public SpotifyApiFacade(IOptions<SpotifySettings> spotifySettings, ILogger<SpotifyApiFacade> logger, SpotifyStatisticsContext dbContext)
         {
             _logger = logger;
             _spotifySettings = spotifySettings.Value;
@@ -227,10 +227,23 @@ namespace Gavinhow.SpotifyStatistics.Api
                         .OrderByDescending(gp => gp.Count())
                         .Take(numOfSongs).ToList();
            
-             List<string> trackIds = topPlays.Select(topPlay => topPlay.Key).ToList();
+            List<string> trackIds = topPlays.Select(topPlay => topPlay.Key).ToList();
             List<FullTrack> tracks = this.GetTracks(trackIds);
 
             return topPlays.Select(topPlay => new SongPlayCount { track = tracks.First(track => track.Id == topPlay.Key), plays = topPlay.Count() }).ToList();
+        }
+
+        public int GetSongCount(string userId)
+        {
+            return GetSongCount(userId, DateTime.MinValue, DateTime.MaxValue);
+        }
+
+        public int GetSongCount(string userId, DateTime startDate, DateTime endDate)
+        {
+            var totalPlays = _dbContext.Plays
+                .Count(play => play.UserId == userId && play.TimeOfPlay > startDate && play.TimeOfPlay < endDate);
+
+            return totalPlays;
         }
 
         public List<ArtistPlayCount> GetTopPlayedArtist(string userId, int numOfArtists = 10)

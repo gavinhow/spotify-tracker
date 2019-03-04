@@ -13,13 +13,13 @@ namespace Gavinhow.SpotifyStatistics.Backend
     {
         private readonly ILogger _logger;
         private Timer _timer;
-        readonly SpotifyApi _spotifyApi;
+        readonly SpotifyApiFacade _spotifyApiFacade;
         readonly SpotifySettings _spotifySettings;
 
-        public ImportHostedService(ILogger<ImportHostedService> logger, SpotifyApi spotifyApi, IOptions<SpotifySettings> spotifySettings)
+        public ImportHostedService(ILogger<ImportHostedService> logger, SpotifyApiFacade spotifyApiFacade, IOptions<SpotifySettings> spotifySettings)
         {
             _logger = logger;
-            _spotifyApi = spotifyApi;
+            _spotifyApiFacade = spotifyApiFacade;
             _spotifySettings = spotifySettings.Value;
 
         }
@@ -37,7 +37,7 @@ namespace Gavinhow.SpotifyStatistics.Backend
         private void DoWork(object state)
         {
             _logger.LogInformation("Timed Background Service is working.");
-            _spotifyApi.UpdateAllUsers().Wait();
+            _spotifyApiFacade.UpdateAllUsers().Wait();
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

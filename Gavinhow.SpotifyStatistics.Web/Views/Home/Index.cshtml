@@ -1,7 +1,7 @@
 ﻿@using Gavinhow.SpotifyStatistics.Api
 
 @model HomeViewModel
-@inject SpotifyApi spotifyApi
+@inject SpotifyApiFacade SpotifyApiFacade
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -10,33 +10,34 @@
     <h1 class="display-4">
         Welcome @(Model.CurrentUser.DisplayName ?? Model.CurrentUser.Id)
     </h1>
-    @if (Model.hasPlays)
+    @if (Model.HasPlays)
     {
-        <p>Oldest song on record: @Model._oldestSong.TrackId - @Model._oldestSong.TimeOfPlay</p>
-        <p>Most played song on record: @Model._mostPlayedSongs[0].track.Name - @Model._mostPlayedSongs[0].plays</p>
+        <p>Oldest song on record: @Model.OldestSong.TrackId - @Model.OldestSong.TimeOfPlay</p>
+        <p>Most played song on record: @Model.MostPlayedSongs[0].track.Name - @Model.MostPlayedSongs[0].plays</p>
         <div>
             <div class="top-songs">
-                <h3>Top 10 most played songs <span class="hint">(since @Model._oldestSong.TimeOfPlay)</span></h3>
+                <h3>Top 10 most played songs <span class="hint">(since @Model.OldestSong.TimeOfPlay)</span></h3>
                 <div>
-                    @foreach (var song in Model._mostPlayedSongs)
+                    @foreach (var song in Model.MostPlayedSongs)
                     {
                         <p>@song.track.Name - @string.Join(", ", song.track.Artists.Select(artist => artist.Name)) : @song.plays</p>
                     }
                 </div>
             </div>
             <div class=top-artists>
-                <h3>Top 10 most played artists</h3>
+                <h3>Top 10 most played artists <span class="hint">(total play count: @Model.TotalPlayCount)</span></h3>
+                
                 <div>
-                    @foreach (var artist in Model._mostPlayedArtists)
+                    @foreach (var artist in Model.MostPlayedArtists)
                     {
                         <p>@artist.artist.Name : @artist.plays</p>
                     }
                 </div>
             </div>
             <div class="top-songs">
-                <h3>Top 10 most played songs last month</h3>
+                <h3>Top 10 most played songs last month <span class="hint">(play count: @Model.LastMonthPlayCount)</span></h3>
                 <div>
-                    @foreach (var song in Model._lastMonthMostPlayedSongs)
+                    @foreach (var song in Model.LastMonthMostPlayedSongs)
                     {
                         <p>@song.track.Name - @string.Join(", ", song.track.Artists.Select(artist => artist.Name)) : @song.plays</p>
                     }
