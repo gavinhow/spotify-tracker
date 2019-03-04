@@ -50,8 +50,8 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
                 _spotifyApiFacade.GetMostPlayedSongs(id,
                     first,
                     last),
-                _spotifyApiFacade.GetSongCount(userId, first, last),
-                _spotifyApiFacade.GetSongCount(userId)));
+                _spotifyApiFacade.GetSongCount(id, first, last),
+                _spotifyApiFacade.GetSongCount(id)));
         }
 
         public IActionResult Privacy()
