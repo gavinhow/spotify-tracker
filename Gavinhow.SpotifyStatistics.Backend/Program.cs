@@ -49,7 +49,7 @@ namespace Gavinhow.SpotifyStatistics.Backend
                          configure.AddConsole()
                                  .SetMinimumLevel(LogLevel.Information)
                          .AddProvider(new ApplicationInsightsLoggerProvider(appInsightsSettings)))
-                     .AddTransient<SpotifyApi, SpotifyApi>()
+                     .AddTransient<SpotifyApiFacade, SpotifyApiFacade>()
                      .AddHostedService<ImportHostedService>()
                      .Configure<ApplicationInsightsSettings>(Configuration.GetSection("ApplicationInsights"))
                      .AddApplicationInsightsTelemetry(Configuration);

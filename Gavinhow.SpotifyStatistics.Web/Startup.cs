@@ -44,7 +44,7 @@ namespace Gavinhow.SpotifyStatistics.Web
 
             services.Configure<SpotifySettings>(Configuration.GetSection("Spotify"));
 
-            services.AddTransient<SpotifyApi>();
+            services.AddTransient<SpotifyApiFacade>();
 
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
