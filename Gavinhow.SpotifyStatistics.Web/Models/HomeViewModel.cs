@@ -1,12 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Gavinhow.SpotifyStatistics.Api.Models;
-using Gavinhow.SpotifyStatistics.Database;
 using Gavinhow.SpotifyStatistics.Database.Entity;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Razor.Language;
-using SpotifyAPI.Web.Models;
-using static Gavinhow.SpotifyStatistics.Web.Controllers.HomeController;
 
 namespace Gavinhow.SpotifyStatistics.Web.Models
 {
