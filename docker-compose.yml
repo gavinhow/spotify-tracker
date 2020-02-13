@@ -6,6 +6,6 @@ services:
     ports:
      - "8080:80"
 
-  backend:
-    build: ./Gavinhow.SpotifyStatistics.Backend/
-    restart: on-failure
+  # backend:
+  #   build: ./Gavinhow.SpotifyStatistics.Backend/
+  #   restart: on-failure

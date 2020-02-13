@@ -1,0 +1,59 @@
+using System;
+using System.Linq;
+using System.Security.Claims;
+using Gavinhow.SpotifyStatistics.Database;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Gavinhow.SpotifyStatistics.Web.Controllers
+{
+    // [Authorize]
+    [Route("[controller]")]
+    public class PlaysController : Controller
+    {
+        private readonly SpotifyStatisticsContext _dbContext;
+
+        public string UserId
+        {
+            get { return User.Claims.First(x => x.Type == ClaimTypes.Name).Value; }
+        }
+        public PlaysController(SpotifyStatisticsContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            return Ok(_dbContext.Plays.Where(play => play.UserId == UserId).ToList());
+        }
+
+        [HttpGet("artists")]
+        public IActionResult GetAllArtists()
+        {
+            var results = from a in _dbContext.ArtistTracks
+                join p in _dbContext.Plays on a.TrackId equals p.TrackId
+                where UserId == p.UserId
+                group new {a, p} by new {a.ArtistId}
+                into g
+                select new
+                {
+                    g.Key.ArtistId,
+                    FirstListen = g.Min(x => x.p.TimeOfPlay)
+                };
+
+            return Ok(results.ToList());
+        }
+
+        [HttpGet("PlaysByDay")]
+        public IActionResult GetGroupedPlaybackHistory()
+        {
+            var results = _dbContext.Plays
+                .Where(x => x.UserId == UserId)
+                .GroupBy(x => x.TimeOfPlay.Date)
+                .OrderBy(x => x.Key)
+                .Select(x => new {Day = (DateTime) x.Key, Value = x.Count()});
+
+            return Ok(results);
+        }
+    }
+}

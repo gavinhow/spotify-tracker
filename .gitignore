@@ -1,5 +1,6 @@
 # Gavin's additions to gitignore
 appsettings.local.json
+appsettings.Development.json
 publish/
 .vscode/
 .idea/
