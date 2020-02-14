@@ -42,16 +42,15 @@ namespace Gavinhow.SpotifyStatistics.ImportFunction
             
             List<string> trackIds = results.ToList();
             log.LogInformation($"Tracks found with no track data {trackIds.Count}");
-
+            int recordsUpdated = 0;
             for (int i = 0; i < trackIds.Count; i += 50)
             {
                 foreach (var item in await _spotifyApiFacade.GetSeveralTracksAsync(trackIds.Skip(i).Take(50).ToList()))
                 {
                     SaveTrackInformation(item);
+                    recordsUpdated += _dbContext.SaveChanges();
                 }
             }
-
-            int recordsUpdated = _dbContext.SaveChanges();
             log.LogInformation($"Records updated {recordsUpdated}");
             return new OkObjectResult($"Tracks imported: {trackIds.Count}");
         }

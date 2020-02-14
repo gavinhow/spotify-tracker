@@ -74,40 +74,5 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
                 Token = tokenString
             });
         }
-
-        // [HttpGet("{id}")]
-        // public IActionResult GetById(int id)
-        // {
-        //     var user =  _userService.GetById(id);
-        //     var userDto = _mapper.Map<UserDto>(user);
-        //     return Ok(userDto);
-        // }
-        //
-        // [HttpPut("{id}")]
-        // public IActionResult Update(int id, [FromBody]UserDto userDto)
-        // {
-        //     // map dto to entity and set id
-        //     var user = _mapper.Map<User>(userDto);
-        //     user.Id = id;
-        //
-        //     try
-        //     {
-        //         // save 
-        //         _userService.Update(user, userDto.Password);
-        //         return Ok();
-        //     } 
-        //     catch(AppException ex)
-        //     {
-        //         // return error message if there was an exception
-        //         return BadRequest(ex.Message);
-        //     }
-        // }
-        //
-        // [HttpDelete("{id}")]
-        // public IActionResult Delete(int id)
-        // {
-        //     _userService.Delete(id);
-        //     return Ok();
-        // }
     }
 }
