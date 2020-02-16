@@ -4,7 +4,13 @@
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
-- master
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - Gavinhow.SpotifyStatistics.Web/*
+
 
 variables:
   # Azure Resource Manager connection created during pipeline creation
