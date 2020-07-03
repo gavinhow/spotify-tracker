@@ -50,10 +50,9 @@ namespace Gavinhow.SpotifyStatistics.Database
                 {
                     ((BaseEntity)entry.Entity).Created = DateTime.UtcNow;
                 }
-            ((BaseEntity)entry.Entity).Modified = DateTime.UtcNow;
+                ((BaseEntity)entry.Entity).Modified = DateTime.UtcNow;
             }
         }
-
     }
 
     public static class DbSetExtensions

@@ -48,7 +48,6 @@ namespace Gavinhow.SpotifyStatistics.Web
             string dbConnString = Configuration.GetConnectionString("Sql");
             services.AddDbContext<SpotifyStatisticsContext>(options =>
             {
-                // options.UseInMemoryDatabase(dbConnString);
                 options.UseSqlServer(dbConnString);
                 //options.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));
             });

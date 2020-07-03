@@ -26,6 +26,12 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
         {
             return Ok(_dbContext.Plays.Where(play => play.UserId == UserId).ToList());
         }
+        
+        [HttpGet("count")]
+        public IActionResult Count()
+        {
+            return Ok(_dbContext.Plays.Count(play => play.UserId == UserId));
+        }
 
         [HttpGet("artists")]
         public IActionResult GetAllArtists()
