@@ -2,7 +2,11 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using Gavinhow.SpotifyStatistics.Database;
+using Gavinhow.SpotifyStatistics.Web.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.IIS;
+using Microsoft.Extensions.Primitives;
 
 namespace Gavinhow.SpotifyStatistics.Web.Controllers
 {
@@ -11,13 +15,29 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
     public class PlaysController : Controller
     {
         private readonly SpotifyStatisticsContext _dbContext;
+        private readonly IUserService _userService;
 
         public string UserId
         {
-            get { return User.Claims.First(x => x.Type == ClaimTypes.Name).Value; }
+            get
+            {
+                string authenticatedUserId = User.Claims.First(x => x.Type == ClaimTypes.Name).Value;
+                var friendId =  Request.Headers["userId"].ToString();
+                if (!string.IsNullOrEmpty(friendId) && friendId != authenticatedUserId)
+                {
+                    if (!_userService.CheckIsFriend(authenticatedUserId, friendId))
+                    {
+                        throw new Exception("Not authorised to see that users details");
+                    }
+
+                    return friendId;
+                }
+                return authenticatedUserId;
+            }
         }
-        public PlaysController(SpotifyStatisticsContext dbContext)
+        public PlaysController(SpotifyStatisticsContext dbContext, IUserService userService)
         {
+            _userService = userService;
             _dbContext = dbContext;
         }
 

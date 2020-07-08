@@ -36,13 +36,8 @@ namespace Gavinhow.SpotifyStatistics.Web
                         builder.WithOrigins("http://localhost:3000");
                         builder.AllowCredentials();
                         builder.AllowAnyHeader();
+                        builder.AllowAnyMethod();
                     });
-            });
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
             string dbConnString = Configuration.GetConnectionString("Sql");
@@ -57,7 +52,7 @@ namespace Gavinhow.SpotifyStatistics.Web
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
-            services.AddTransient<UserService>();
+            services.AddTransient<IUserService, UserService>();
             services.AddTransient<SpotifyApiFacade>();
 
             services.AddDistributedMemoryCache();
@@ -90,12 +85,6 @@ namespace Gavinhow.SpotifyStatistics.Web
             if (!env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                // app.UseHsts();
             }
             app.UseRouting();
             app.UseAuthentication();

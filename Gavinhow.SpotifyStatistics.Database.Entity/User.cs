@@ -20,6 +20,8 @@ namespace Gavinhow.SpotifyStatistics.Database.Entity
         public DateTime TokenCreateDate { get; set; }
 
         public List<Play> Plays { get; set; }
+        
+        public List<Friend> Friends { get; set; }
 
     }
 }
