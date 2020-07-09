@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Gavinhow.SpotifyStatistics.Api.Settings;
 using Gavinhow.SpotifyStatistics.Database;
 using Gavinhow.SpotifyStatistics.Database.Entity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SpotifyAPI.Web;
 using SpotifyAPI.Web.Auth;
@@ -20,6 +21,7 @@ namespace Gavinhow.SpotifyStatistics.Web.Services
         void RemoveFriend(string id, string friendId);
         IEnumerable<Friend> GetFriends(string id);
         bool CheckIsFriend(string authenticatedUserId, string friendId);
+        string GetDisplayName(string id);
     }
     
     public class UserService : IUserService
@@ -105,7 +107,6 @@ namespace Gavinhow.SpotifyStatistics.Web.Services
             };
             _dbContext.Friends.Remove(friend);
             _dbContext.SaveChanges();
-
         }
 
         public IEnumerable<Friend> GetFriends(string id)
@@ -117,6 +118,11 @@ namespace Gavinhow.SpotifyStatistics.Web.Services
         {
             return _dbContext.Friends.Any(record =>
                 (record.FriendId == authenticatedUserId && record.UserId == friendId));
+        }
+
+        public string GetDisplayName(string id)
+        {
+            return _dbContext.Users.Find(id).DisplayName;
         }
     }
 }

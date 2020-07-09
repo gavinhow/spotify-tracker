@@ -101,6 +101,12 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
     {
       return Ok(_userService.GetFriends(UserId));
     }
+    
+    [HttpGet("DisplayName/{id}")]
+    public IActionResult DisplayName(string id)
+    {
+      return Ok(_userService.GetDisplayName(id));
+    }
 
     public class FriendRequestBodyModel
     {
