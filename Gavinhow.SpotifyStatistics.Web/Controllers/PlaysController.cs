@@ -10,9 +10,10 @@ using Microsoft.Extensions.Primitives;
 
 namespace Gavinhow.SpotifyStatistics.Web.Controllers
 {
-    // [Authorize]
+    [Authorize]
     [Route("[controller]")]
-    public class PlaysController : Controller
+    [ApiController]
+    public class PlaysController : ControllerBase
     {
         private readonly SpotifyStatisticsContext _dbContext;
         private readonly IUserService _userService;
@@ -45,6 +46,17 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
         public IActionResult GetAll()
         {
             return Ok(_dbContext.Plays.Where(play => play.UserId == UserId).ToList());
+        }
+        
+        [HttpGet("top")]
+        public IActionResult Top([FromQuery]int top=10)
+        {
+            return Ok(_dbContext.Plays.Where(play => play.UserId == UserId)
+                .GroupBy(item => item.TrackId)
+                .Select(g => new {TrackId = g.Key, Count = g.Count() })
+                .OrderByDescending(g => g.Count)
+                .Take(top)
+                .ToList());
         }
         
         [HttpGet("count")]

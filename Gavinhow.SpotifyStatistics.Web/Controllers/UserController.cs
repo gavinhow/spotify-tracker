@@ -18,6 +18,7 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
 {
   [ApiController]
   [Route("[controller]")]
+  [Authorize]
   public class UserController : ControllerBase
   {
     private readonly IUserService _userService;

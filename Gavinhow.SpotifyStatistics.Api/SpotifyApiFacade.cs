@@ -6,7 +6,6 @@ using Gavinhow.SpotifyStatistics.Api.Models;
 using Gavinhow.SpotifyStatistics.Api.Settings;
 using Gavinhow.SpotifyStatistics.Database;
 using Gavinhow.SpotifyStatistics.Database.Entity;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SpotifyAPI.Web;
 using SpotifyAPI.Web.Auth;
@@ -18,7 +17,6 @@ namespace Gavinhow.SpotifyStatistics.Api
     public class SpotifyApiFacade
     {
         private readonly SpotifySettings _spotifySettings;
-        private readonly ILogger _logger;
         private Token _token;
         private readonly CredentialsAuth _credentialsAuth;
 
@@ -33,9 +31,8 @@ namespace Gavinhow.SpotifyStatistics.Api
             }
         }
 
-        public SpotifyApiFacade(IOptions<SpotifySettings> spotifySettings, ILogger<SpotifyApiFacade> logger)
+        public SpotifyApiFacade(IOptions<SpotifySettings> spotifySettings)
         {
-            _logger = logger;
             _spotifySettings = spotifySettings.Value;
             _credentialsAuth = new CredentialsAuth(_spotifySettings.ClientId, _spotifySettings.ClientSecret);
         }

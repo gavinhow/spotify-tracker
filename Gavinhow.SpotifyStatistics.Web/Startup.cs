@@ -6,7 +6,6 @@ using Gavinhow.SpotifyStatistics.Web.Services;
 using Gavinhow.SpotifyStatistics.Web.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,7 +45,7 @@ namespace Gavinhow.SpotifyStatistics.Web
                 options.UseSqlServer(dbConnString);
                 //options.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));
             });
-
+            
             services.AddControllers();
             services.Configure<SpotifySettings>(Configuration.GetSection("Spotify"));
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
