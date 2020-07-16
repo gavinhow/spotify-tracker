@@ -32,8 +32,8 @@ namespace Gavinhow.SpotifyStatistics.Web
                 options.AddPolicy(MyAllowSpecificOrigins,
                     builder =>
                     {
-                        builder.WithOrigins("http://localhost:3000");
-                        builder.AllowCredentials();
+                        builder.AllowAnyOrigin();
+                        // builder.AllowCredentials();
                         builder.AllowAnyHeader();
                         builder.AllowAnyMethod();
                     });
@@ -43,10 +43,12 @@ namespace Gavinhow.SpotifyStatistics.Web
             services.AddDbContext<SpotifyStatisticsContext>(options =>
             {
                 options.UseSqlServer(dbConnString);
+                // options.UseSqlite("DataSource=app.db");
                 //options.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));
             });
             
             services.AddControllers();
+            services.AddMemoryCache(options => options.SizeLimit = 1024);
             services.Configure<SpotifySettings>(Configuration.GetSection("Spotify"));
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
             var appSettingsSection = Configuration.GetSection("AppSettings");
