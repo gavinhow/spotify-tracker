@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using System.Linq;
 using Gavinhow.SpotifyStatistics.Api;
 using Gavinhow.SpotifyStatistics.Database.Entity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SpotifyAPI.Web.Models;
 
 namespace Gavinhow.SpotifyStatistics.Web.Controllers
 {
@@ -21,7 +23,7 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
         [HttpGet]
         public IActionResult GetMultiple([FromQuery] string[] ids)
         {
-            return Ok(_spotifyApi.GetTracks(ids.ToList()).Select(item => new { item.Id, item.Name}));
+            return Ok(_spotifyApi.GetTracks(ids.ToList()).Select(item => new { item.Id, item.Name, artists = item.Artists.Select(artist => new { artist.Id, artist.Name})}));
         }
     }
 }

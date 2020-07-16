@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Gavinhow.SpotifyStatistics.Api.Models;
 using Gavinhow.SpotifyStatistics.Api.Settings;
-using Gavinhow.SpotifyStatistics.Database;
-using Gavinhow.SpotifyStatistics.Database.Entity;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using SpotifyAPI.Web;
 using SpotifyAPI.Web.Auth;
@@ -16,23 +13,27 @@ namespace Gavinhow.SpotifyStatistics.Api
 {
     public class SpotifyApiFacade
     {
+        private readonly IMemoryCache _cache;
         private readonly SpotifySettings _spotifySettings;
         private Token _token;
         private readonly CredentialsAuth _credentialsAuth;
 
         private Token CredentialsToken
         {
-            get {
+            get
+            {
                 if (_token == null || _token.IsExpired())
                 {
                     _token = _credentialsAuth.GetToken().Result;
                 }
+
                 return _token;
             }
         }
 
-        public SpotifyApiFacade(IOptions<SpotifySettings> spotifySettings)
+        public SpotifyApiFacade(IOptions<SpotifySettings> spotifySettings, IMemoryCache memoryCache)
         {
+            _cache = memoryCache;
             _spotifySettings = spotifySettings.Value;
             _credentialsAuth = new CredentialsAuth(_spotifySettings.ClientId, _spotifySettings.ClientSecret);
         }
@@ -40,8 +41,9 @@ namespace Gavinhow.SpotifyStatistics.Api
         public async Task<Token> RefreshToken(string refreshToken)
         {
             AuthorizationCodeAuth auth =
-                    new AuthorizationCodeAuth(_spotifySettings.ClientId, _spotifySettings.ClientSecret, "https://localhost:5001/Login/Authorise", "https://localhost:5001",
-                        Scope.UserReadRecentlyPlayed);
+                new AuthorizationCodeAuth(_spotifySettings.ClientId, _spotifySettings.ClientSecret,
+                    "https://localhost:5001/Login/Authorise", "https://localhost:5001",
+                    Scope.UserReadRecentlyPlayed);
             return await auth.RefreshToken(refreshToken);
         }
 
@@ -58,32 +60,65 @@ namespace Gavinhow.SpotifyStatistics.Api
 
         public async Task<FullTrack> GetTrackAsync(string trackId)
         {
-            SpotifyWebAPI api = new SpotifyWebAPI { TokenType = CredentialsToken.TokenType, AccessToken = CredentialsToken.AccessToken };
+            SpotifyWebAPI api = new SpotifyWebAPI
+                {TokenType = CredentialsToken.TokenType, AccessToken = CredentialsToken.AccessToken};
 
             return await api.GetTrackAsync(trackId);
         }
 
         public FullTrack GetTrack(string trackId)
         {
-            SpotifyWebAPI api = new SpotifyWebAPI { TokenType = CredentialsToken.TokenType, AccessToken = CredentialsToken.AccessToken };
+            SpotifyWebAPI api = new SpotifyWebAPI
+                {TokenType = CredentialsToken.TokenType, AccessToken = CredentialsToken.AccessToken};
             return api.GetTrack(trackId);
         }
 
         public List<FullTrack> GetTracks(List<string> trackIds)
         {
-            SpotifyWebAPI api = new SpotifyWebAPI { TokenType = CredentialsToken.TokenType, AccessToken = CredentialsToken.AccessToken };
-            return api.GetSeveralTracks(trackIds).Tracks;
+            List<FullTrack> result = new List<FullTrack>();
+
+            for (int i = trackIds.Count - 1; i >= 0; i--)
+            {
+                FullTrack output;
+                if (_cache.TryGetValue(trackIds[i], out output))
+                {
+                    trackIds.RemoveAt(i);
+                    result.Add(output);
+                }
+            }
+
+            if (trackIds.Count > 0)
+            {
+                SpotifyWebAPI api = new SpotifyWebAPI
+                    {TokenType = CredentialsToken.TokenType, AccessToken = CredentialsToken.AccessToken};
+                var apiResult = api.GetSeveralTracks(trackIds).Tracks;
+                foreach (var track in apiResult)
+                {
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        // Set cache entry size by extension method.
+                        .SetSize(1)
+                        // Keep in cache for this time, reset time if accessed.
+                        .SetSlidingExpiration(TimeSpan.FromDays(1));
+                    _cache.Set(track.Id, track, cacheEntryOptions);
+                }
+
+                result.AddRange(apiResult);
+            }
+
+            return result;
         }
-        
+
         public async Task<List<FullTrack>> GetSeveralTracksAsync(List<string> trackIds)
         {
-            SpotifyWebAPI api = new SpotifyWebAPI { TokenType = CredentialsToken.TokenType, AccessToken = CredentialsToken.AccessToken };
+            SpotifyWebAPI api = new SpotifyWebAPI
+                {TokenType = CredentialsToken.TokenType, AccessToken = CredentialsToken.AccessToken};
             return (await api.GetSeveralTracksAsync(trackIds)).Tracks;
         }
 
         public List<FullArtist> GetArtists(List<string> artistIds)
         {
-            SpotifyWebAPI api = new SpotifyWebAPI {TokenType = CredentialsToken.TokenType, AccessToken = CredentialsToken.AccessToken};
+            SpotifyWebAPI api = new SpotifyWebAPI
+                {TokenType = CredentialsToken.TokenType, AccessToken = CredentialsToken.AccessToken};
 
             return api.GetSeveralArtists(artistIds).Artists;
         }

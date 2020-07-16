@@ -5,8 +5,6 @@ using Gavinhow.SpotifyStatistics.Database;
 using Gavinhow.SpotifyStatistics.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Server.IIS;
-using Microsoft.Extensions.Primitives;
 
 namespace Gavinhow.SpotifyStatistics.Web.Controllers
 {
@@ -49,9 +47,11 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
         }
         
         [HttpGet("top")]
-        public IActionResult Top([FromQuery]int top=10)
+        public IActionResult Top([FromQuery]DateTime? start, [FromQuery]DateTime? end, [FromQuery]int top=10)
         {
-            return Ok(_dbContext.Plays.Where(play => play.UserId == UserId)
+            start ??= DateTime.MinValue;
+            end ??= DateTime.Now;
+            return Ok(_dbContext.Plays.Where(play => play.UserId == UserId && play.TimeOfPlay < end && play.TimeOfPlay > start)
                 .GroupBy(item => item.TrackId)
                 .Select(g => new {TrackId = g.Key, Count = g.Count() })
                 .OrderByDescending(g => g.Count)
@@ -60,17 +60,21 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
         }
         
         [HttpGet("count")]
-        public IActionResult Count()
+        public IActionResult Count([FromQuery]DateTime? start, [FromQuery]DateTime? end)
         {
-            return Ok(_dbContext.Plays.Count(play => play.UserId == UserId));
+            start ??= DateTime.MinValue;
+            end ??= DateTime.Now;
+            return Ok(_dbContext.Plays.Count(play => play.UserId == UserId && play.TimeOfPlay < end && play.TimeOfPlay > start));
         }
 
         [HttpGet("artists")]
-        public IActionResult GetAllArtists()
+        public IActionResult GetAllArtists([FromQuery]DateTime? start, [FromQuery]DateTime? end)
         {
+            start ??= DateTime.MinValue;
+            end ??= DateTime.Now;
             var results = from a in _dbContext.ArtistTracks
                 join p in _dbContext.Plays on a.TrackId equals p.TrackId
-                where UserId == p.UserId
+                where UserId == p.UserId && p.TimeOfPlay < end && p.TimeOfPlay > start
                 group new {a, p} by new {a.ArtistId}
                 into g
                 select new
