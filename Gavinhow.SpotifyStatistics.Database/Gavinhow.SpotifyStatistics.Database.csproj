@@ -9,8 +9,8 @@
     <ProjectReference Include="..\Gavinhow.SpotifyStatistics.Database.Entity\Gavinhow.SpotifyStatistics.Database.Entity.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.6" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="SeedData" />
