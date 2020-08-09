@@ -122,5 +122,13 @@ namespace Gavinhow.SpotifyStatistics.Api
 
             return api.GetSeveralArtists(artistIds).Artists;
         }
+        
+        public List<FullAlbum> GetAlbums(List<string> albumIds)
+        {
+            SpotifyWebAPI api = new SpotifyWebAPI
+                {TokenType = CredentialsToken.TokenType, AccessToken = CredentialsToken.AccessToken};
+
+            return api.GetSeveralAlbums(albumIds).Albums;
+        }
     }
 }
