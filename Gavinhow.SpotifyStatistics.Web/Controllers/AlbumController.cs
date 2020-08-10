@@ -47,8 +47,24 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
         [HttpGet]
         public IActionResult GetMultiple([FromQuery] string[] ids)
         {
-            return Ok(_spotifyApi.GetAlbums(ids.ToList()).Select(item => new { item.Id, item.Name, artists = item.Artists
-            .Select(artist => new { artist.Id, artist.Name})}));
+            return Ok(_spotifyApi.GetAlbums(ids.ToList()).Select(item => 
+                new { item.Id, 
+                    item.Name, 
+                    artists = item.Artists
+                            .Select(artist => new { artist.Id, artist.Name}), 
+                    imageUrl = item.Images[0].Url, 
+                    Tracks = item.Tracks
+                            .Items.Select(track => 
+                                new {id = track.Id, 
+                                    track.Name, 
+                                    artists = item.Artists.Select(artist => 
+                                        new { artist.Id,
+                                            artist.Name})
+                                }
+                            )
+                }
+                )
+            );
         }
         
         [HttpGet("top")]

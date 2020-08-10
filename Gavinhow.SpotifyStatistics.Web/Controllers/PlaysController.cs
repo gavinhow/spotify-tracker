@@ -41,9 +41,11 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public IActionResult GetMultiple([FromQuery] string[] ids)
         {
-            return Ok(_dbContext.Plays.Where(play => play.UserId == UserId).ToList());
+            return Ok(_dbContext.Plays.Where(play => play.UserId == UserId && ids.Contains(play.TrackId)).GroupBy(item => item.TrackId).Select(play
+             => new {Id = play.Key, Count = play.Count()})
+            .ToList());
         }
         
         [HttpGet("top")]
