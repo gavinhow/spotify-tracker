@@ -1,0 +1,74 @@
+# ASP.NET
+# Build and test ASP.NET projects.
+# Add steps that publish symbols, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
+
+trigger:
+- master
+
+stages:
+- stage: Build
+  pool:
+    vmImage: 'windows-latest'
+  jobs:
+    - job: Build
+      variables:
+        solution: '**/*.sln'
+        buildPlatform: 'Any CPU'
+        buildConfiguration: 'Release'
+
+      steps:
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'build'
+          projects: '**/*.csproj'
+          arguments: '--configuration $(BuildConfiguration)'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/*.csproj'
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+          zipAfterPublish: false
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '$(build.artifactstagingdirectory)'
+          artifact: 'drop'
+          publishLocation: 'pipeline'
+
+- stage: Deployment
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  pool:
+    vmImage: 'ubuntu-latest'
+  jobs:
+    - deployment: Deployment
+      environment: 'Scaleway.scw-aca2fd'
+      strategy:
+        runOnce:
+          preDeploy:
+              steps:
+                - script: sudo systemctl stop spotifytracker.service
+          deploy:
+            steps:
+              - task: replacetokens@3
+                inputs:
+                  rootDirectory: '$(Pipeline.Workspace)/drop/Gavinhow.SpotifyStatistics.Web'
+                  targetFiles: '**\appsettings.json'
+                  encoding: 'auto'
+                  writeBOM: true
+                  escapeType: 'none'
+                  actionOnMissing: 'fail'
+                  keepToken: false
+                  tokenPrefix: '#{'
+                  tokenSuffix: '}#'
+                  useLegacyPattern: false
+                  enableTelemetry: true
+              - task: CopyFiles@2
+                inputs:
+                  SourceFolder: '$(Pipeline.Workspace)/drop/Gavinhow.SpotifyStatistics.Web'
+                  Contents: '**'
+                  TargetFolder: '/var/www/spotifytracker'
+                  CleanTargetFolder: true
+                  OverWrite: true
+              - script: sudo systemctl start spotifytracker.service
