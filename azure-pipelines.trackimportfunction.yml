@@ -50,10 +50,10 @@ stages:
         rootFolderOrFile: '$(System.DefaultWorkingDirectory)/publish_output'
         includeRootFolder: false
         archiveType: zip
-        archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+        archiveFile: $(Build.ArtifactStagingDirectory)/TrackImport.zip
         replaceExistingArchive: true
 
-    - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+    - publish: $(Build.ArtifactStagingDirectory)/TrackImport.zip
       artifact: drop
 
 - stage: Deployment
@@ -73,5 +73,5 @@ stages:
                   azureSubscription: 'Spotify Azure'
                   appType: 'functionApp'
                   appName: 'SpotifyImportFunction'
-                  package: '$(Pipeline.Workspace)/drop/*.zip'
+                  package: '$(Pipeline.Workspace)/drop/TrackImport.zip'
                   deploymentMethod: 'auto'
