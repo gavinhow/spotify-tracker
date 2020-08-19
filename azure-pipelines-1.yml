@@ -4,7 +4,12 @@
 # https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
 
 trigger:
-- master
+  branches:
+    include:
+    - master
+  paths:
+      include:
+      - Gavinhow.SpotifyStatistics.Web/*
 
 stages:
 - stage: Build
