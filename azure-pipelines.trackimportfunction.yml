@@ -55,3 +55,23 @@ stages:
 
     - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
       artifact: drop
+
+- stage: Deployment
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  pool:
+    vmImage: 'ubuntu-latest'
+  jobs:
+    - deployment: Deployment
+      environment: 'Scaleway.scw-aca2fd'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureFunctionApp@1
+                inputs:
+                  azureSubscription: 'Spotify Azure'
+                  appType: 'functionApp'
+                  appName: 'SpotifyImportFunction'
+                  package: '$(System.DefaultWorkingDirectory)/_TrackImport/drop/*.zip'
+                  deploymentMethod: 'auto'
