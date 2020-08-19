@@ -9,7 +9,7 @@ trigger:
     - master
   paths:
     include:
-    - Gavinhow.SpotifyStatistics.ImportFunction/*
+    - Services/Gavinhow.SpotifyStatistics.ImportFunction/*
 
 
 variables:
@@ -23,7 +23,7 @@ variables:
   vmImageName: 'vs2017-win2016'
 
   # Working Directory
-  workingDirectory: '$(System.DefaultWorkingDirectory)/Gavinhow.SpotifyStatistics.ImportFunction'
+  workingDirectory: '$(System.DefaultWorkingDirectory)/Services/Gavinhow.SpotifyStatistics.ImportFunction'
 
 stages:
 - stage: Build

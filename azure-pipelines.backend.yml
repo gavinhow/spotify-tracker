@@ -9,7 +9,7 @@ trigger:
     - master
   paths:
       include:
-      - Gavinhow.SpotifyStatistics.Web/*
+      - Services/Gavinhow.SpotifyStatistics.Web/*
 
 stages:
 - stage: Build
@@ -26,13 +26,13 @@ stages:
       - task: DotNetCoreCLI@2
         inputs:
           command: 'build'
-          projects: '**/*.csproj'
+          projects: 'Services/**/*.csproj'
           arguments: '--configuration $(BuildConfiguration)'
       - task: DotNetCoreCLI@2
         inputs:
           command: 'publish'
           publishWebProjects: false
-          projects: '**/*.csproj'
+          projects: 'Services/**/*.csproj'
           arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
           zipAfterPublish: false
       - task: PublishPipelineArtifact@1
