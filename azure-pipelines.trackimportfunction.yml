@@ -73,5 +73,5 @@ stages:
                   azureSubscription: 'Spotify Azure'
                   appType: 'functionApp'
                   appName: 'SpotifyImportFunction'
-                  package: '$(System.DefaultWorkingDirectory)/_TrackImport/drop/*.zip'
+                  package: '$(System.DefaultWorkingDirectory)/drop/*.zip'
                   deploymentMethod: 'auto'
