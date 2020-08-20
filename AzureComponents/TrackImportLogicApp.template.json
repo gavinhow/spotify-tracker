@@ -1,0 +1,110 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.Logic/workflows",
+      "apiVersion": "2017-07-01",
+      "name": "UserImportTrigger",
+      "location": "westeurope",
+      "properties": {
+        "state": "Enabled",
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "$connections": {
+              "defaultValue": {},
+              "type": "Object"
+            }
+          },
+          "triggers": {
+            "Recurrence": {
+              "recurrence": {
+                "frequency": "Minute",
+                "interval": 25
+              },
+              "type": "Recurrence"
+            }
+          },
+          "actions": {
+            "For_each": {
+              "foreach": "@body('Get_rows_(V2)')?['value']",
+              "actions": {
+                "ImportUserHistory": {
+                  "runAfter": {},
+                  "type": "Function",
+                  "inputs": {
+                    "function": {
+                      "id": "[concat(resourceGroup().id,'/providers/Microsoft.Web/sites/SpotifyImportFunction', '/functions/ImportUserHistory')]"
+                    },
+                    "queries": {
+                      "userid": "@{items('For_each')?['Id']}"
+                    },
+                    "retryPolicy": {
+                      "count": 1,
+                      "interval": "PT20S",
+                      "type": "fixed"
+                    }
+                  }
+                }
+              },
+              "runAfter": {
+                "Get_rows_(V2)": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Foreach"
+            },
+            "Get_rows_(V2)": {
+              "runAfter": {},
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['sql']['connectionId']"
+                  }
+                },
+                "method": "get",
+                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('default'))},@{encodeURIComponent(encodeURIComponent('default'))}/tables/@{encodeURIComponent(encodeURIComponent('[SpotifyTracker].[Users]'))}/items"
+              }
+            },
+            "ImportTrackInformation": {
+              "runAfter": {
+                "For_each": [
+                  "Succeeded",
+                  "Failed",
+                  "Skipped",
+                  "TimedOut"
+                ]
+              },
+              "type": "Function",
+              "inputs": {
+                "function": {
+                  "id": "[concat(resourceGroup().id,'/providers/Microsoft.Web/sites/SpotifyImportFunction', '/functions/ImportTrackInformation')]"
+                },
+                "retryPolicy": {
+                  "type": "none"
+                }
+              }
+            }
+          },
+          "outputs": {}
+        },
+        "parameters": {
+          "$connections": {
+            "value": {
+              "sql": {
+                "connectionId": "[concat(resourceGroup().id,'/providers/Microsoft.Web/connections/sql')]",
+                "connectionName": "sql",
+                "id": "[concat('/subscriptions/',subscription().subscriptionId,'/providers/Microsoft.Web/locations/westeurope/managedApis/sql')]"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
