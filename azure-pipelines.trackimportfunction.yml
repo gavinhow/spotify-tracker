@@ -53,8 +53,19 @@ stages:
         archiveFile: $(Build.ArtifactStagingDirectory)/TrackImport.zip
         replaceExistingArchive: true
 
-    - publish: $(Build.ArtifactStagingDirectory)/TrackImport.zip
-      artifact: drop
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)/AzureComponents/'
+        Contents: '**'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+        artifact: 'drop'
+        publishLocation: 'pipeline'
+
+
 
 - stage: Deployment
   dependsOn: Build
@@ -63,7 +74,7 @@ stages:
     vmImage: 'ubuntu-latest'
   jobs:
     - deployment: Deployment
-      environment: 'Scaleway.scw-aca2fd'
+      environment: 'Azure'
       strategy:
         runOnce:
           deploy:
@@ -75,3 +86,15 @@ stages:
                   appName: 'SpotifyImportFunction'
                   package: '$(Pipeline.Workspace)/drop/TrackImport.zip'
                   deploymentMethod: 'auto'
+              
+              - task: AzureResourceManagerTemplateDeployment@3
+                inputs:
+                  deploymentScope: 'Resource Group'
+                  azureResourceManagerConnection: 'Spotify Azure'
+                  subscriptionId: '6178f8f4-4ec0-4a9f-a9d2-07a7b9653a6f'
+                  action: 'Create Or Update Resource Group'
+                  resourceGroupName: 'spotitrack-prod'
+                  location: 'UK South'
+                  templateLocation: 'Linked artifact'
+                  csmFile: '$(Pipeline.Workspace)/drop/TrackImportLogicApp.template.json'
+                  deploymentMode: 'Incremental'
