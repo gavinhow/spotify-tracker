@@ -42,13 +42,13 @@ namespace Gavinhow.SpotifyStatistics.Web
             string dbConnString = Configuration.GetConnectionString("Sql");
             services.AddDbContext<SpotifyStatisticsContext>(options =>
             {
-                // options.UseSqlServer(dbConnString);
+                options.UseSqlServer(dbConnString);
                 // options.UseSqlite("DataSource=app.db");
-                options.UseNpgsql(
-                    dbConnString);
+                // options.UseNpgsql(
+                //     dbConnString);
                 //options.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));
             });
-            
+
             services.AddControllers();
             services.AddMemoryCache(options => options.SizeLimit = 1024);
             services.Configure<SpotifySettings>(Configuration.GetSection("Spotify"));
@@ -59,7 +59,7 @@ namespace Gavinhow.SpotifyStatistics.Web
             services.AddTransient<SpotifyApiFacade>();
 
             services.AddDistributedMemoryCache();
-            
+
             // configure jwt authentication
             var appSettings = appSettingsSection.Get<AppSettings>();
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
@@ -92,12 +92,12 @@ namespace Gavinhow.SpotifyStatistics.Web
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseCors(MyAllowSpecificOrigins); 
+            app.UseCors(MyAllowSpecificOrigins);
             app.UseHttpsRedirection();
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
             });
-            
+
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetService<SpotifyStatisticsContext>();
