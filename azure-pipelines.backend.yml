@@ -41,11 +41,50 @@ stages:
           artifact: 'drop'
           publishLocation: 'pipeline'
 
-- stage: Deployment
+- stage: Deployment_Dev
+  dependsOn: Build
+  variables: 
+    - group: development
+  condition: and(succeeded(), contains(variables['Build.SourceBranch'], 'refs/heads/feature'))
+  pool:
+    vmImage: 'ubuntu-latest'
+  jobs:
+    - deployment: Deployment
+      environment: 'Development'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: replacetokens@3
+                inputs:
+                  rootDirectory: '$(Pipeline.Workspace)/drop/Gavinhow.SpotifyStatistics.Web'
+                  targetFiles: '**\appsettings.json'
+                  encoding: 'auto'
+                  writeBOM: true
+                  escapeType: 'none'
+                  actionOnMissing: 'fail'
+                  keepToken: false
+                  tokenPrefix: '#{'
+                  tokenSuffix: '}#'
+                  useLegacyPattern: false
+                  enableTelemetry: true
+                  
+              - task: AzureWebApp@1
+                inputs:
+                  azureSubscription: 'Spotify Azure - Dev'
+                  appType: 'webAppLinux'
+                  appName: 'spotitrack-backend-dev'
+                  package: '$(Pipeline.Workspace)/drop/Gavinhow.SpotifyStatistics.Web'
+                  runtimeStack: 'DOTNETCORE|3.1'
+
+
+- stage: Deployment_Prod
   dependsOn: Build
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   pool:
     vmImage: 'ubuntu-latest'
+  variables: 
+    - group: production
   jobs:
     - deployment: Deployment
       environment: 'Scaleway.scw-aca2fd'

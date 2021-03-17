@@ -48,7 +48,54 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
         [HttpGet]
         public IActionResult GetMultiple([FromQuery] string[] ids)
         {
-            return Ok(_spotifyApi.GetArtists(ids.ToList()).Select(item => new { item.Id, item.Name }));
+            return Ok(_spotifyApi.GetArtists(ids.ToList()).Select(item => 
+                new { 
+                    item.Id,
+                    item.Name,
+                    ImageUrl = item.Images[0].Url
+                }));
+        }
+        
+        [HttpGet("detail")]
+        public IActionResult GetDetail([FromQuery] string id)
+        {
+            var albums = from p in _dbContext.Plays
+                join t in _dbContext.Tracks on p.TrackId equals t.Id
+                join aa in _dbContext.ArtistAlbums on t.AlbumId equals aa.AlbumId
+                where aa.ArtistId == id && p.UserId == UserId
+                group p by aa.AlbumId
+                into g
+                select new
+                {
+                    id = g.Key,
+                    Count = g.Count()
+                };
+
+            var allPlays = from a in _dbContext.ArtistTracks
+                join p in _dbContext.Plays on a.TrackId equals p.TrackId
+                where UserId == p.UserId && a.ArtistId == id
+                select new { p.TimeOfPlay, p.TrackId};
+
+            var firstListen = allPlays.Min(x => x.TimeOfPlay);
+
+            var topSongs = (from a in allPlays
+                group a by a.TrackId
+                into g
+                select new
+                {
+                    id = g.Key,
+                    Count = g.Count()
+                }).OrderByDescending(item => item.Count).Take(10);
+
+            return Ok(new
+            {
+                id, 
+                albums = albums.ToList(),
+                totalPlays = allPlays.Count(),
+                firstListen,
+                topSongs = topSongs.ToList()
+            });
+
         }
         
         [HttpGet("top")]

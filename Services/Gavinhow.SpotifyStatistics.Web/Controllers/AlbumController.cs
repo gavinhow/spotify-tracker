@@ -59,13 +59,16 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
                                     track.Name, 
                                     artists = item.Artists.Select(artist => 
                                         new { artist.Id,
-                                            artist.Name})
+                                            artist.Name,})
                                 }
-                            )
+                            ),
+                    item.ReleaseDate
                 }
                 )
             );
         }
+        
+        
         
         [HttpGet("top")]
         public IActionResult Top([FromQuery]DateTime? start, [FromQuery]DateTime? end, [FromQuery]int top=10)

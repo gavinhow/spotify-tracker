@@ -67,21 +67,55 @@ stages:
 
 
 
-- stage: Deployment
+- stage: Deployment_Dev
+  dependsOn: Build
+  condition: and(succeeded(), contains(variables['Build.SourceBranch'], 'refs/heads/feature'))
+  pool:
+    vmImage: 'ubuntu-latest'
+  jobs:
+    - deployment: Deployment
+      environment: 'Development'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureResourceManagerTemplateDeployment@3
+                inputs:
+                  deploymentScope: 'Resource Group'
+                  azureResourceManagerConnection: 'Spotify Azure - Dev'
+                  subscriptionId: '421a65e5-bb3d-4816-9755-a3a026b5688f'
+                  action: 'Create Or Update Resource Group'
+                  resourceGroupName: 'spotitrack-dev'
+                  location: 'UK South'
+                  templateLocation: 'Linked artifact'
+                  csmFile: '$(Pipeline.Workspace)/drop/TrackImportLogicApp.template.json'
+                  overrideParameters: '-functionAppName "SpotifyImportFunction-dev"'
+                  deploymentMode: 'Incremental'
+              
+              - task: AzureFunctionApp@1
+                inputs:
+                  azureSubscription: 'Spotify Azure - Dev'
+                  appType: 'functionApp'
+                  appName: 'SpotifyImportFunction-dev'
+                  package: '$(Pipeline.Workspace)/drop/TrackImport.zip'
+                  deploymentMethod: 'auto'
+
+
+- stage: Deployment_Prod
   dependsOn: Build
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   pool:
     vmImage: 'ubuntu-latest'
   jobs:
     - deployment: Deployment
-      environment: 'Azure'
+      environment: 'Production'
       strategy:
         runOnce:
           deploy:
             steps:
               - task: AzureFunctionApp@1
                 inputs:
-                  azureSubscription: 'Spotify Azure'
+                  azureSubscription: 'Spotify Azure - Prod'
                   appType: 'functionApp'
                   appName: 'SpotifyImportFunction'
                   package: '$(Pipeline.Workspace)/drop/TrackImport.zip'
@@ -90,7 +124,7 @@ stages:
               - task: AzureResourceManagerTemplateDeployment@3
                 inputs:
                   deploymentScope: 'Resource Group'
-                  azureResourceManagerConnection: 'Spotify Azure'
+                  azureResourceManagerConnection: 'Spotify Azure - Prod'
                   subscriptionId: '6178f8f4-4ec0-4a9f-a9d2-07a7b9653a6f'
                   action: 'Create Or Update Resource Group'
                   resourceGroupName: 'spotitrack-prod'
