@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using Gavinhow.SpotifyStatistics.Api;
 using Gavinhow.SpotifyStatistics.Api.Settings;
 using Gavinhow.SpotifyStatistics.Database;
@@ -98,6 +99,8 @@ namespace Gavinhow.SpotifyStatistics.Web
                 endpoints.MapControllers();
             });
 
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+            
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetService<SpotifyStatisticsContext>();
