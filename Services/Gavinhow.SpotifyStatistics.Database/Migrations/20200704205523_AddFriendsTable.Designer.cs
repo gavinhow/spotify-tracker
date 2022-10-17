@@ -19,16 +19,13 @@ namespace Gavinhow.SpotifyStatistics.Database.Migrations
             modelBuilder
                 .HasDefaultSchema("SpotifyTracker")
                 .HasAnnotation("ProductVersion", "3.1.1")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             modelBuilder.Entity("Gavinhow.SpotifyStatistics.Database.Entity.ArtistAlbum", b =>
-                {
-                    b.Property<string>("AlbumId")
-                        .HasColumnType("nvarchar(450)");
+            {
+                b.Property<string>("AlbumId");
 
-                    b.Property<string>("ArtistId")
-                        .HasColumnType("nvarchar(450)");
+                b.Property<string>("ArtistId");
 
                     b.HasKey("AlbumId", "ArtistId");
 
@@ -55,18 +52,14 @@ namespace Gavinhow.SpotifyStatistics.Database.Migrations
                 });
 
             modelBuilder.Entity("Gavinhow.SpotifyStatistics.Database.Entity.Friend", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+            {
+                b.Property<string>("UserId");
 
-                    b.Property<string>("FriendId")
-                        .HasColumnType("nvarchar(450)");
+                b.Property<string>("FriendId");
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("Created");
 
-                    b.Property<DateTime>("Modified")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("Modified");
 
                     b.HasKey("UserId", "FriendId");
 
@@ -74,21 +67,16 @@ namespace Gavinhow.SpotifyStatistics.Database.Migrations
                 });
 
             modelBuilder.Entity("Gavinhow.SpotifyStatistics.Database.Entity.Play", b =>
-                {
-                    b.Property<string>("TrackId")
-                        .HasColumnType("nvarchar(450)");
+            {
+                b.Property<string>("TrackId");
 
-                    b.Property<DateTime>("TimeOfPlay")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("TimeOfPlay");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                b.Property<string>("UserId");
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("Created");
 
-                    b.Property<DateTime>("Modified")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("Modified");
 
                     b.HasKey("TrackId", "TimeOfPlay", "UserId");
 
@@ -98,18 +86,14 @@ namespace Gavinhow.SpotifyStatistics.Database.Migrations
                 });
 
             modelBuilder.Entity("Gavinhow.SpotifyStatistics.Database.Entity.Track", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+            {
+                b.Property<string>("Id");
 
-                    b.Property<string>("AlbumId")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("AlbumId");
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("Created");
 
-                    b.Property<DateTime>("Modified")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("Modified");
 
                     b.HasKey("Id");
 
@@ -117,30 +101,22 @@ namespace Gavinhow.SpotifyStatistics.Database.Migrations
                 });
 
             modelBuilder.Entity("Gavinhow.SpotifyStatistics.Database.Entity.User", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+            {
+                b.Property<string>("Id");
 
-                    b.Property<string>("AccessToken")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("AccessToken");
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("Created");
 
-                    b.Property<string>("DisplayName")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("DisplayName");
 
-                    b.Property<double>("ExpiresIn")
-                        .HasColumnType("float");
+                b.Property<double>("ExpiresIn");
 
-                    b.Property<DateTime>("Modified")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("Modified");
 
-                    b.Property<string>("RefreshToken")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("RefreshToken");
 
-                    b.Property<DateTime>("TokenCreateDate")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("TokenCreateDate");
 
                     b.HasKey("Id");
 

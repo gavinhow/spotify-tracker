@@ -23,7 +23,7 @@ namespace Gavinhow.SpotifyStatistics.ImportFunction
             string connectionString = config.GetConnectionString("MyConn");
             builder.Services.AddHttpClient();
             builder.Services.AddDbContext<SpotifyStatisticsContext>(options =>
-                    options.UseSqlServer(connectionString))
+                    options.UseNpgsql(connectionString))
                 .AddOptions<SpotifySettings>()
                 .Configure<IConfiguration>((settings, configuration) =>
                 {
