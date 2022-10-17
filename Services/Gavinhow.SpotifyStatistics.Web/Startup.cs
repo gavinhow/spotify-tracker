@@ -42,7 +42,7 @@ namespace Gavinhow.SpotifyStatistics.Web
             string dbConnString = Configuration.GetConnectionString("Sql");
             services.AddDbContext<SpotifyStatisticsContext>(options =>
             {
-                options.UseSqlServer(dbConnString);
+                options.UseNpgsql(dbConnString);
                 // options.UseSqlite("DataSource=app.db");
                 // options.UseNpgsql(
                 //     dbConnString);

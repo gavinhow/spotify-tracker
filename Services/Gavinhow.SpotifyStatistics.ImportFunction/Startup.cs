@@ -20,7 +20,7 @@ namespace Gavinhow.SpotifyStatistics.ImportFunction
                 .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
-            string connectionString = config.GetConnectionString("MyConn");
+            string connectionString = config.GetValue<string>("DbConnection");
             builder.Services.AddHttpClient();
             builder.Services.AddDbContext<SpotifyStatisticsContext>(options =>
                     options.UseNpgsql(connectionString))
