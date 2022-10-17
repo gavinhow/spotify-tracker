@@ -12,6 +12,7 @@ trigger:
     - Services/Gavinhow.SpotifyStatistics.ImportFunction/*
 
 
+
 variables:
   # Azure Resource Manager connection created during pipeline creation
   azureSubscription: 'fee35f64-4ca9-4ab7-a32d-f678084e62f3'
