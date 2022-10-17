@@ -17,8 +17,7 @@ namespace Gavinhow.SpotifyStatistics.Database.Migrations
             modelBuilder
                 .HasDefaultSchema("SpotifyTracker")
                 .HasAnnotation("ProductVersion", "3.1.1")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             modelBuilder.Entity("Gavinhow.SpotifyStatistics.Database.Entity.ArtistAlbum", b =>
                 {
