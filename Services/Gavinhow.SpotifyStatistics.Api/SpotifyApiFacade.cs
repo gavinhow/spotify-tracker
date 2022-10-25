@@ -123,11 +123,26 @@ namespace Gavinhow.SpotifyStatistics.Api
             return api.GetSeveralArtists(artistIds).Artists;
         }
         
+        public async Task<List<FullArtist>> GetArtistsAsync(List<string> artistIds)
+        {
+            SpotifyWebAPI api = new SpotifyWebAPI
+                {TokenType = CredentialsToken.TokenType, AccessToken = CredentialsToken.AccessToken};
+
+            return (await api.GetSeveralArtistsAsync(artistIds)).Artists;
+        }
+        
         public List<FullAlbum> GetAlbums(List<string> albumIds)
         {
             SpotifyWebAPI api = new SpotifyWebAPI
                 {TokenType = CredentialsToken.TokenType, AccessToken = CredentialsToken.AccessToken};
             return api.GetSeveralAlbums(albumIds).Albums;
+        }
+        
+        public async Task<List<FullAlbum>> GetAlbumsAsync(List<string> albumIds)
+        {
+            SpotifyWebAPI api = new SpotifyWebAPI
+                {TokenType = CredentialsToken.TokenType, AccessToken = CredentialsToken.AccessToken};
+            return (await api.GetSeveralAlbumsAsync(albumIds)).Albums;
         }
 
         public List<SimpleAlbum> GetArtistsAlbums(string artistId)

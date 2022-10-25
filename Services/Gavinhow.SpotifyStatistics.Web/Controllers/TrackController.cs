@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Gavinhow.SpotifyStatistics.Api;
 using Gavinhow.SpotifyStatistics.Database.Entity;
 using Microsoft.AspNetCore.Authorization;
@@ -21,9 +22,10 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetMultiple([FromQuery] string[] ids)
+        public async Task<IActionResult> GetMultiple([FromQuery] string[] ids)
         {
-            return Ok(_spotifyApi.GetTracks(ids.ToList()).Select(item => new { item.Id, item.Name, ImageUrl = item.Album
+            return Ok((await _spotifyApi.GetSeveralTracksAsync(ids.ToList())).Select(item => new { item.Id, item.Name, 
+            ImageUrl = item.Album
             .Images[0].Url , 
             artists = item
             .Artists.Select(artist => new { artist.Id, artist.Name})}));
