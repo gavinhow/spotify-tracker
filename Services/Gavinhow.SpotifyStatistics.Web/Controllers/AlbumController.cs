@@ -1,11 +1,13 @@
 using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Gavinhow.SpotifyStatistics.Api;
 using Gavinhow.SpotifyStatistics.Database;
 using Gavinhow.SpotifyStatistics.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Gavinhow.SpotifyStatistics.Web.Controllers
 {
@@ -45,9 +47,9 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
         }
         
         [HttpGet]
-        public IActionResult GetMultiple([FromQuery] string[] ids)
+        public async Task<IActionResult> GetMultiple([FromQuery] string[] ids)
         {
-            return Ok(_spotifyApi.GetAlbums(ids.ToList()).Select(item => 
+            return Ok((await _spotifyApi.GetAlbumsAsync(ids.ToList())).Select(item => 
                 new { item.Id, 
                     item.Name, 
                     artists = item.Artists
@@ -71,18 +73,18 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
         
         
         [HttpGet("top")]
-        public IActionResult Top([FromQuery]DateTime? start, [FromQuery]DateTime? end, [FromQuery]int top=10)
+        public async Task<IActionResult> Top([FromQuery]DateTime? start, [FromQuery]DateTime? end, [FromQuery]int top=10)
         {
             start ??= DateTime.MinValue;
             end ??= DateTime.Now;
 
-            return Ok(_dbContext.Plays
+            return Ok(await _dbContext.Plays
                 .Where(play => play.UserId == UserId && play.TimeOfPlay < end && play.TimeOfPlay > start)
                 .GroupBy(item => item.Track.AlbumId)
                 .Select(g => new {Id = g.Key, Count = g.Count()})
                 .OrderByDescending(g => g.Count)
                 .Take(top)
-                .ToList());
+                .ToListAsync());
         }
     }
 }

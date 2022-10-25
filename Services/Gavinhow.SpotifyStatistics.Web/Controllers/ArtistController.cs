@@ -1,11 +1,13 @@
 using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Gavinhow.SpotifyStatistics.Api;
 using Gavinhow.SpotifyStatistics.Database;
 using Gavinhow.SpotifyStatistics.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Gavinhow.SpotifyStatistics.Web.Controllers
 {
@@ -46,9 +48,9 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
         }
         
         [HttpGet]
-        public IActionResult GetMultiple([FromQuery] string[] ids)
+        public async Task<IActionResult> GetMultiple([FromQuery] string[] ids)
         {
-            return Ok(_spotifyApi.GetArtists(ids.ToList()).Select(item => 
+            return Ok((await _spotifyApi.GetArtistsAsync(ids.ToList())).Select(item => 
                 new { 
                     item.Id,
                     item.Name,
@@ -57,7 +59,7 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
         }
         
         [HttpGet("detail")]
-        public IActionResult GetDetail([FromQuery] string id)
+        public async Task<IActionResult> GetDetail([FromQuery] string id)
         {
             var albums = from p in _dbContext.Plays
                 join t in _dbContext.Tracks on p.TrackId equals t.Id
@@ -76,7 +78,7 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
                 where UserId == p.UserId && a.ArtistId == id
                 select new { p.TimeOfPlay, p.TrackId};
 
-            var firstListen = allPlays.Min(x => x.TimeOfPlay);
+            var firstListen = await allPlays.MinAsync(x => x.TimeOfPlay);
 
             var topSongs = (from a in allPlays
                 group a by a.TrackId
@@ -90,16 +92,16 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
             return Ok(new
             {
                 id, 
-                albums = albums.ToList(),
-                totalPlays = allPlays.Count(),
+                albums = await albums.ToListAsync(),
+                totalPlays = await allPlays.CountAsync(),
                 firstListen,
-                topSongs = topSongs.ToList()
+                topSongs = await topSongs.ToListAsync()
             });
 
         }
         
         [HttpGet("top")]
-        public IActionResult Top([FromQuery]DateTime? start, [FromQuery]DateTime? end, [FromQuery]int top=10)
+        public async Task<IActionResult> Top([FromQuery]DateTime? start, [FromQuery]DateTime? end, [FromQuery]int top=10)
         {
             start ??= DateTime.MinValue;
             end ??= DateTime.Now;
@@ -115,7 +117,7 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
                     Count = g.Count()
                 }).OrderByDescending(item => item.Count).Take(top);
 
-            return Ok(results.ToList());
+            return Ok(await results.ToListAsync());
         }
     }
 }
