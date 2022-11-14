@@ -55,6 +55,19 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
                         => new { Id = play.Key, Count = play.Count() })
                     .ToListAsync());
         }
+        
+        [HttpGet("history")]
+        public async Task<IActionResult> Top([FromQuery] int skip = 0, [FromQuery] int count = 20)
+        {
+            return Ok(await _dbContext.Plays
+                .Where(play => play.UserId == UserId)
+                .OrderByDescending(play => play.TimeOfPlay)
+                .Skip(skip)
+                .Take(count)
+                .Select(play
+                    => new { play.TrackId, play.TimeOfPlay })
+                .ToListAsync());
+        }
 
         [HttpGet("top")]
         public async Task<IActionResult> Top([FromQuery] DateTime? start, [FromQuery] DateTime? end, [FromQuery] int top 
