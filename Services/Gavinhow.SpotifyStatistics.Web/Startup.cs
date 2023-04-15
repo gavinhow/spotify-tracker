@@ -41,13 +41,23 @@ namespace Gavinhow.SpotifyStatistics.Web
             });
 
             string dbConnString = Configuration.GetConnectionString("Sql");
+            string databaseType = Configuration.GetValue<string>("DatabaseType");
             services.AddDbContext<SpotifyStatisticsContext>(options =>
             {
-                options.UseNpgsql(dbConnString);
-                // options.UseSqlite("DataSource=app.db");
-                // options.UseNpgsql(
-                //     dbConnString);
-                //options.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));
+                switch (databaseType.ToLower())
+                {
+                    case "local":
+                        options.UseSqlite("DataSource=app.db");
+                        break;
+                    case "postgres":
+                        options.UseNpgsql(dbConnString);
+                        break;
+                    case "sqlserver":
+                        options.UseSqlServer(dbConnString);
+                        break;
+                    default:
+                        throw new ArgumentException("Unrecognised database type");
+                }
             });
 
             services.AddControllers();
