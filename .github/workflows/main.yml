@@ -11,6 +11,7 @@ env:
   tg_version: 'latest'
   TERRAGRUNT_AUTO_INIT: 'false'
   TF_INPUT: false
+  ARM_USE_CLI: false
 
 jobs:
   validate_terragrunt:
