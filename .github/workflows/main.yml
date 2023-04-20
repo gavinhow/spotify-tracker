@@ -16,7 +16,7 @@ jobs:
     name: Validate Terragrunt
     runs-on: ubuntu-latest
     env:
-      tf_working_dir: '${{ github.workspace }}/infrastructure/live/dev'
+      tf_working_dir: './infrastructure/live/dev'
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: develop
     env:
-      tf_working_dir: '${{ github.workspace }}/infrastructure/live/dev'
+      tf_working_dir: './infrastructure/live/dev'
       TF_VAR_postgres_connection: ${{ secrets.POSTGRES_CONNECTION }}
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
