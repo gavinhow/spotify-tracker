@@ -10,6 +10,7 @@ env:
   tf_version: 'latest'
   tg_version: 'latest'
   TERRAGRUNT_AUTO_INIT: 'false'
+  TF_INPUT: false
 
 jobs:
   validate_terragrunt:
@@ -28,14 +29,16 @@ jobs:
         with:
           tf_actions_version: ${{ env.tf_version }}
           tg_actions_version: ${{ env.tg_version }}
-          tf_actions_subcommand: 'run-all init'
+          tf_actions_binary: "terragrunt run-all"
+          tf_actions_subcommand: 'init'
           tf_actions_working_dir: ${{ env.tf_working_dir }}
       - name: 'Validate'
         uses: the-commons-project/terragrunt-github-actions@master
         with:
           tf_actions_version: ${{ env.tf_version }}
           tg_actions_version: ${{ env.tg_version }}
-          tf_actions_subcommand: 'run-all validate'
+          tf_actions_binary: "terragrunt run-all"
+          tf_actions_subcommand: 'validate'
           tf_actions_working_dir: ${{ env.tf_working_dir }}
 
   develop:
@@ -57,12 +60,14 @@ jobs:
         with:
           tf_actions_version: ${{ env.tf_version }}
           tg_actions_version: ${{ env.tg_version }}
-          tf_actions_subcommand: 'run-all init'
+          tf_actions_binary: "terragrunt run-all"
+          tf_actions_subcommand: 'init'
           tf_actions_working_dir: ${{ env.tf_working_dir }}
       - name: 'Apply'
         uses: the-commons-project/terragrunt-github-actions@master
         with:
           tf_actions_version: ${{ env.tf_version }}
           tg_actions_version: ${{ env.tg_version }}
-          tf_actions_subcommand: 'run-all apply -auto-approve'
+          tf_actions_binary: "terragrunt run-all"
+          tf_actions_subcommand: 'apply'
           tf_actions_working_dir: ${{ env.tf_working_dir }}
