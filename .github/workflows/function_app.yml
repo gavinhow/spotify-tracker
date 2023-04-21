@@ -1,0 +1,18 @@
+name: CI/CD Function App
+on:
+  push:
+    branches:
+      - main
+      - feature/deploy_function_app
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Function App
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.0.x'
+      - run: dotnet build ./Services/Gavinhow.SpotifyStatistics.ImportFunction/Gavinhow.SpotifyStatistics.ImportFunction.csproj --configuration Release --output ./publish_output
