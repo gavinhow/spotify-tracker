@@ -1,0 +1,55 @@
+name: 'Terraform Deploy'
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'The environment to deploy to'
+        required: true
+        type: string
+      tf_working_dir:
+        description: 'The working directory for Terraform'
+        required: true
+        type: string
+      tf_version:
+        description: 'The version of Terraform to use'
+        required: false
+        default: 'latest'
+        type: string
+      tg_version:
+        description: 'The version of Terragrunt to use'
+        required: false
+        default: 'latest'
+        type: string
+
+jobs:
+  apply_terragrunt:
+    name: ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      TF_VAR_postgres_connection: ${{ secrets.POSTGRES_CONNECTION }}
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      TF_INPUT: false
+      ARM_USE_CLI: false
+      TERRAGRUNT_AUTO_INIT: false
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'Init'
+        uses: the-commons-project/terragrunt-github-actions@master
+        with:
+          tf_actions_version: ${{ inputs.tf_version }}
+          tg_actions_version: ${{ inputs.tg_version }}
+          tf_actions_binary: "terragrunt run-all"
+          tf_actions_subcommand: 'init'
+          tf_actions_working_dir: ${{ inputs.tf_working_dir }}
+      - name: 'Apply'
+        uses: the-commons-project/terragrunt-github-actions@master
+        with:
+          tf_actions_version: ${{ inputs.tf_version }}
+          tg_actions_version: ${{ inputs.tg_version }}
+          tf_actions_binary: "terragrunt run-all"
+          tf_actions_subcommand: 'apply'
+          tf_actions_working_dir: ${{ inputs.tf_working_dir }}

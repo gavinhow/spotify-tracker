@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  validate_terragrunt:
+    name: Validate Terragrunt
+    uses: ./.github/workflows/terraform-validate.yml
+    with:
+      environment: develop
+      tf_working_dir: './infrastructure/live/dev'
+    secrets: inherit
+
+  develop:
+    name: Deploy Terraform
+    needs: validate_terragrunt
+    uses: ./.github/workflows/terraform-deploy.yml
+    with:
+      environment: develop
+      tf_working_dir: './infrastructure/live/dev'
+    secrets: inherit
