@@ -35,4 +35,5 @@ output "database" {
     username = postgresql_role.spotify_role.name
     password = postgresql_role.spotify_role.password
   }
+  sensitive = true
 }
