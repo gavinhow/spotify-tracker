@@ -4,14 +4,7 @@ on:
   push:
     branches:
       - main
-      - feature/terraform
-
-env:
-  tf_version: 'latest'
-  tg_version: 'latest'
-  TERRAGRUNT_AUTO_INIT: 'false'
-  TF_INPUT: false
-  ARM_USE_CLI: false
+  workflow_dispatch:
 
 jobs:
   validate_terragrunt:
@@ -23,7 +16,7 @@ jobs:
     secrets: inherit
 
   develop:
-    name: Deploy Develop Terraform
+    name: Deploy Terraform
     needs: validate_terragrunt
     uses: ./.github/workflows/terraform-deploy.yml
     with:
