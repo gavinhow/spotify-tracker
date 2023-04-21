@@ -15,10 +15,11 @@ env:
 
 jobs:
   validate_terragrunt:
-    name: Validate Terragrunt - Caller
+    name: Validate Terragrunt
     uses: ./.github/workflows/terraform-validate.yml
     with:
       environment: develop
+      tf_working_dir: './infrastructure/live/dev'
     secrets: inherit
 
   develop:
