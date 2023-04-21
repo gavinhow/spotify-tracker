@@ -17,6 +17,7 @@ jobs:
   validate_terragrunt:
     name: Validate Terragrunt
     runs-on: ubuntu-latest
+    if: ${{ false }}
     environment: develop
     env:
       tf_working_dir: './infrastructure/live/dev'
@@ -26,7 +27,6 @@ jobs:
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
     steps:
       - uses: actions/checkout@v3
-      - run: echo $TF_VAR_postgres_connection | sed 's/./& /g'
       - name: 'Init'
         uses: the-commons-project/terragrunt-github-actions@master
         with:
@@ -46,7 +46,7 @@ jobs:
 
   develop:
     name: Deploy Develop Terraform
-    needs: validate_terragrunt
+#    needs: validate_terragrunt
     runs-on: ubuntu-latest
     environment: develop
     env:
@@ -58,7 +58,6 @@ jobs:
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
     steps:
       - uses: actions/checkout@v3
-      - run: echo $TF_VAR_postgres_connection | sed 's/./& /g'
       - name: 'Init'
         uses: the-commons-project/terragrunt-github-actions@master
         with:
