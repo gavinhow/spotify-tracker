@@ -17,6 +17,7 @@ jobs:
   validate_terragrunt:
     name: Validate Terragrunt
     runs-on: ubuntu-latest
+    environment: develop
     env:
       tf_working_dir: './infrastructure/live/dev'
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
