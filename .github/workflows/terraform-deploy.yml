@@ -1,4 +1,4 @@
-name: 'Terraform Validate'
+name: 'Terraform Deploy'
 on:
   workflow_call:
     inputs:
@@ -21,14 +21,13 @@ on:
         default: 'latest'
         type: string
 
-
-
 jobs:
-  validate_terragrunt:
+  apply_terragrunt:
     name: ${{ inputs.environment }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:
+      TF_VAR_postgres_connection: ${{ secrets.POSTGRES_CONNECTION }}
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
@@ -46,11 +45,11 @@ jobs:
           tf_actions_binary: "terragrunt run-all"
           tf_actions_subcommand: 'init'
           tf_actions_working_dir: ${{ inputs.tf_working_dir }}
-      - name: 'Validate'
+      - name: 'Apply'
         uses: the-commons-project/terragrunt-github-actions@master
         with:
           tf_actions_version: ${{ inputs.tf_version }}
           tg_actions_version: ${{ inputs.tg_version }}
           tf_actions_binary: "terragrunt run-all"
-          tf_actions_subcommand: 'validate'
+          tf_actions_subcommand: 'apply'
           tf_actions_working_dir: ${{ inputs.tf_working_dir }}
