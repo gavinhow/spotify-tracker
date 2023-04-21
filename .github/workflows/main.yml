@@ -25,6 +25,7 @@ jobs:
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
     steps:
       - uses: actions/checkout@v3
+      - run: az --version
       - name: 'Init'
         uses: the-commons-project/terragrunt-github-actions@master
         with:
