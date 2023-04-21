@@ -12,10 +12,15 @@ resource "postgresql_database" "spotify" {
   name = var.database_name
 }
 
+resource "random_password" "password" {
+  length           = 16
+  special          = false
+}
+
 resource "postgresql_role" "spotify_role" {
   name     = "spotify_${var.environment}"
   login    = true
-  password = "Password123"
+  password = random_password.password.result
 }
 
 resource "postgresql_grant" "spotify_role" {
@@ -33,7 +38,7 @@ output "database" {
     port     = var.postgres_connection.port
     database = postgresql_database.spotify.name
     username = postgresql_role.spotify_role.name
-    password = postgresql_role.spotify_role.password
+    password = random_password.password.result
   }
   sensitive = true
 }
