@@ -6,6 +6,7 @@ provider "postgresql" {
   password        = var.postgres_connection.password
   sslmode         = var.postgres_connection.sslmode
   connect_timeout = 15
+  superuser       = false
 }
 
 resource "postgresql_database" "spotify" {
@@ -13,8 +14,8 @@ resource "postgresql_database" "spotify" {
 }
 
 resource "random_password" "password" {
-  length           = 16
-  special          = false
+  length  = 16
+  special = false
 }
 
 resource "postgresql_role" "spotify_role" {
@@ -28,7 +29,7 @@ resource "postgresql_grant" "spotify_role" {
   role        = postgresql_role.spotify_role.name
   object_type = "database"
   privileges  = [
-      "CREATE", "CONNECT", "TEMPORARY",
+    "CREATE", "CONNECT", "TEMPORARY",
   ]
 }
 
