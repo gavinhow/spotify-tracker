@@ -6,15 +6,29 @@ on:
         description: 'The environment to deploy to'
         required: true
         type: string
+      tf_working_dir:
+        description: 'The working directory for Terraform'
+        required: true
+        type: string
+      tf_version:
+        description: 'The version of Terraform to use'
+        required: false
+        default: 'latest'
+        type: string
+      tg_version:
+        description: 'The version of Terragrunt to use'
+        required: false
+        default: 'latest'
+        type: string
+
 
 
 jobs:
   validate_terragrunt:
-    name: Validate Terragrunt - ${{ inputs.environment }}
+    name: ${{ inputs.environment }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:
-      tf_working_dir: './infrastructure/live/dev'
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
@@ -24,16 +38,16 @@ jobs:
       - name: 'Init'
         uses: the-commons-project/terragrunt-github-actions@master
         with:
-          tf_actions_version: ${{ env.tf_version }}
-          tg_actions_version: ${{ env.tg_version }}
+          tf_actions_version: ${{ inputs.tf_version }}
+          tg_actions_version: ${{ inputs.tg_version }}
           tf_actions_binary: "terragrunt run-all"
           tf_actions_subcommand: 'init'
-          tf_actions_working_dir: ${{ env.tf_working_dir }}
+          tf_actions_working_dir: ${{ inputs.tf_working_dir }}
       - name: 'Validate'
         uses: the-commons-project/terragrunt-github-actions@master
         with:
-          tf_actions_version: ${{ env.tf_version }}
-          tg_actions_version: ${{ env.tg_version }}
+          tf_actions_version: ${{ inputs.tf_version }}
+          tg_actions_version: ${{ inputs.tg_version }}
           tf_actions_binary: "terragrunt run-all"
           tf_actions_subcommand: 'validate'
-          tf_actions_working_dir: ${{ env.tf_working_dir }}
+          tf_actions_working_dir: ${{ inputs.tf_working_dir }}
