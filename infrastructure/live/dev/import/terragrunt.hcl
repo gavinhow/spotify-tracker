@@ -21,7 +21,7 @@ dependency "db" {
       password = "spotify_mock"
     }
   }
-  mock_outputs_allowed_terraform_commands = ["validate"]
+  mock_outputs_allowed_terraform_commands = ["init","validate"]
 }
 
 inputs = {
