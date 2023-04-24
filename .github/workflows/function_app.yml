@@ -5,6 +5,8 @@ on:
       - 'Services/Gavinhow.SpotifyStatistics.ImportFunction/**'
       - 'infrastructure/**/import/**'
       - '.github/workflows/function_app.yml'
+      - '.github/workflows/function_app-deploy.yml'
+      - '.github/workflows/function_app-deploy-flow.yml'
       - '.github/workflows/terraform-deploy.yml'
     branches:
       - main
@@ -14,7 +16,7 @@ on:
 
 jobs:
   build:
-    name: Build Function App
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
