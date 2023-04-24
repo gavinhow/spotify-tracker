@@ -87,12 +87,12 @@ jobs:
           creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
       - name: Get Publish Profile
         run: |
-          echo "PUBLISH_PROFILE=$(az webapp deployment list-publishing-profiles -g '${{ env.function_app_resource_group }}' -n '${{ env.function_app_name }}' --xml)" >> $GITHUB_OUTPUT
+          echo "PUBLISH_PROFILE=$(az webapp deployment list-publishing-profiles -g '${{ env.FUNCTION_APP_RESOURCE_GROUP }}' -n '${{ env.FUNCTION_APP_NAME }}' --xml)" >> $GITHUB_OUTPUT
         id: getPublishProfile
 
       - name: 'Deploy Function App to Azure'
         uses: Azure/functions-action@v1
         with:
-          app-name: ${{ env.function_app_name }}
+          app-name: ${{ env.FUNCTION_APP_NAME }}
           package: './function_app'
           publish-profile: ${{ steps.getPublishProfile.outputs.PUBLISH_PROFILE }}
