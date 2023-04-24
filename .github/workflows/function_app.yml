@@ -21,8 +21,14 @@ jobs:
           name: import_function_app
           path: ./publish_output/
           if-no-files-found: error
+      - uses: actions/upload-artifact@v3
+        with:
+          name: terraform
+          path: './infrastructure/'
+          if-no-files-found: error
   deploy_terraform_dev:
     name: Deploy Terraform to develop
+    needs: build
     runs-on: ubuntu-latest
     environment: develop
     env:
@@ -41,7 +47,10 @@ jobs:
       function_app_name: ${{ fromJson(steps.output.outputs.tf_actions_output).import_function_app_name.value }}
       function_app_resource_group: ${{ fromJson(steps.output.outputs.tf_actions_output).import_function_app_resource_group_name.value }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: terraform
+          path: ./infrastructure
       - name: 'Terragrunt init'
         uses: the-commons-project/terragrunt-github-actions@master
         with:
@@ -86,7 +95,7 @@ jobs:
           creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
       - name: Get Publish Profile
         run: |
-          echo "::set-output name=PUBLISH_PROFILE::$(az webapp deployment list-publishing-profiles -g '${{ needs.deploy_terraform_dev.outputs.function_app_resource_group }}' -n '${{ needs.deploy_terraform_dev.outputs.function_app_name }}' --xml)"
+          echo "PUBLISH_PROFILE=$(az webapp deployment list-publishing-profiles -g '${{ needs.deploy_terraform_dev.outputs.function_app_resource_group }}' -n '${{ needs.deploy_terraform_dev.outputs.function_app_name }}' --xml)" >> $GITHUB_OUTPUT
         id: getPublishProfile
 
       - name: 'Deploy Function App to Azure'
