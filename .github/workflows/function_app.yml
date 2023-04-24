@@ -4,6 +4,8 @@ on:
     paths:
       - 'Services/Gavinhow.SpotifyStatistics.ImportFunction/**'
       - 'infrastructure/**/import/**'
+      - '.github/workflows/function_app.yml'
+      - '.github/workflows/terraform-deploy.yml'
     branches:
       - main
       - feature/deploy_function_app
