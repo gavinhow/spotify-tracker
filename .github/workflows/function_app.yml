@@ -35,7 +35,19 @@ jobs:
           path: './infrastructure/'
           if-no-files-found: error
 
-  deploy:
-    needs: build
-    uses: ./.github/workflows/function_app-deploy-flow.yml
+  develop:
+    name: 'Deploy'
+    needs: [ build ]
+    uses: ./.github/workflows/function_app-deploy.yml
+    with:
+      environment: develop
+      tf_working_dir: './infrastructure/live/dev/import'
+    secrets: inherit
+  production:
+    name: 'Deploy'
+    needs: [ build, develop ]
+    uses: ./.github/workflows/function_app-deploy.yml
+    with:
+      environment: production
+      tf_working_dir: './infrastructure/live/prod/import'
     secrets: inherit

@@ -74,8 +74,7 @@ jobs:
         run: |
           echo "FUNCTION_APP_NAME=${{ fromJson(steps.output.outputs.tf_actions_output).import_function_app_name.value }}" >> $GITHUB_ENV
           echo "FUNCTION_APP_RESOURCE_GROUP=${{ fromJson(steps.output.outputs.tf_actions_output).import_function_app_resource_group_name.value }}" >> $GITHUB_ENV
-        id: getPublishProfile
-
+      
 
       # Function App Deployment
       - uses: actions/download-artifact@v3
