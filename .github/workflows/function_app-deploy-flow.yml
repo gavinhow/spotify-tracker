@@ -1,0 +1,20 @@
+name: 'Function App Deploy'
+on:
+  workflow_call:
+
+
+
+jobs:
+  develop:
+    name: 'Develop'
+    uses: ./.github/workflows/function_app-deploy.yml
+    with:
+      environment: develop
+    secrets: inherit
+  production:
+    name: 'Production'
+    needs: [ develop ]
+    uses: ./.github/workflows/function_app-deploy.yml
+    with:
+      environment: production
+    secrets: inherit
