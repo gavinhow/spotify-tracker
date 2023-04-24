@@ -33,8 +33,11 @@ jobs:
 
   deploy_terraform_dev:
     needs: build
-    uses: .github/workflows/terraform-deploy.yml
-
+    uses: ./.github/workflows/terraform-deploy.yml
+    with:
+      environment: develop
+      tf_working_dir: './infrastructure/live/dev/import'
+    secrets: inherit
 
 
   deploy_dev:
