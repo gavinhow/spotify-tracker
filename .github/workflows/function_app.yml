@@ -21,10 +21,8 @@ jobs:
           name: import_function_app
           path: ./publish_output/
           if-no-files-found: error
-
-  deploy_dev:
-    name: Deploy Function App to develop
-    needs: build
+  deploy_terraform_dev:
+    name: Deploy Terraform to develop
     runs-on: ubuntu-latest
     environment: develop
     env:
@@ -39,12 +37,11 @@ jobs:
       ARM_USE_CLI: false
       TERRAGRUNT_AUTO_INIT: false
       TERRAGRUNT_LOG_LEVEL: error
+    outputs:
+      function_app_name: ${{ fromJson(steps.output.outputs.tf_actions_output).import_function_app_name.value }}
+      function_app_resource_group: ${{ fromJson(steps.output.outputs.tf_actions_output).import_function_app_resource_group_name.value }}
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
-        with:
-          name: import_function_app
-          path: ./function_app
       - name: 'Terragrunt init'
         uses: the-commons-project/terragrunt-github-actions@master
         with:
@@ -71,18 +68,31 @@ jobs:
           tf_actions_subcommand: 'output'
           tf_actions_working_dir: './infrastructure/live/dev/import'
 
+
+  deploy_dev:
+    name: Deploy Function App to develop
+    needs: [ build, deploy_terraform_dev ]
+    runs-on: ubuntu-latest
+    environment: develop
+
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: import_function_app
+          path: ./function_app
+
       - uses: Azure/login@v1
         with:
           creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
       - name: Get Publish Profile
         run: |
-          echo "::set-output name=PUBLISH_PROFILE::$(az webapp deployment list-publishing-profiles -g '${{ fromJson(steps.output.outputs.tf_actions_output).import_function_app_resource_group_name.value }}' -n '${{ fromJson(steps.output.outputs.tf_actions_output).import_function_app_name.value }}' --xml)"
+          echo "::set-output name=PUBLISH_PROFILE::$(az webapp deployment list-publishing-profiles -g '${{ needs.deploy_terraform_dev.outputs.function_app_resource_group }}' -n '${{ needs.deploy_terraform_dev.outputs.function_app_name }}' --xml)"
         id: getPublishProfile
 
       - name: 'Deploy Function App to Azure'
         uses: Azure/functions-action@v1
         id: fa
         with:
-          app-name: ${{ fromJson(steps.output.outputs.tf_actions_output).import_function_app_name.value }}
+          app-name: ${{ needs.deploy_terraform_dev.outputs.function_app_name  }}
           package: './function_app'
           publish-profile: ${{ steps.getPublishProfile.outputs.PUBLISH_PROFILE }}
