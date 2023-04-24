@@ -6,7 +6,7 @@ on:
 jobs:
   validate_terragrunt:
     name: Validate Terragrunt
-    uses: ./.github/workflows/terraform-validate.yml
+    uses: ./.github/workflows/terraform-validate-all.yml
     with:
       environment: develop
       tf_working_dir: './infrastructure/live/dev'
@@ -15,7 +15,7 @@ jobs:
   develop:
     name: Deploy Terraform
     needs: validate_terragrunt
-    uses: ./.github/workflows/terraform-deploy.yml
+    uses: ./.github/workflows/terraform-deploy-all.yml
     with:
       environment: develop
       tf_working_dir: './infrastructure/live/dev'
