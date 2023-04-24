@@ -21,12 +21,9 @@ on:
         default: 'latest'
         type: string
     outputs:
-      function_app_name:
-        description: 'The name of the function app'
-        type: string
-      function_app_resource_group:
-        description: 'The name of the resource group for the function app'
-        type: string
+      tf_actions_output:
+        description: 'Output from tf output'
+        value: ${{ jobs.apply_terragrunt.outputs.tf_actions_output }}
 
 jobs:
   apply_terragrunt:
