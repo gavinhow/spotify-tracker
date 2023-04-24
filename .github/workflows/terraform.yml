@@ -1,9 +1,6 @@
-name: CI/CD Terraform
+name: Deploy all Terraform
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:

@@ -6,7 +6,6 @@ provider "azurerm" {
 }
 
 
-
 ###
 ### Function App
 ###
@@ -40,4 +39,12 @@ resource "azurerm_windows_function_app" "import_function_app" {
   provider = azurerm.import
 
   site_config {}
+}
+
+output "import_function_app_name" {
+  value = azurerm_windows_function_app.import_function_app.name
+}
+
+output "import_function_app_resource_group_name" {
+  value = azurerm_windows_function_app.import_function_app.resource_group_name
 }
