@@ -1,0 +1,94 @@
+name: 'Logic App Deploy'
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'The environment to deploy to'
+        required: true
+        type: string
+      tf_version:
+        description: 'The version of Terraform to use'
+        required: false
+        default: 'latest'
+        type: string
+      tg_version:
+        description: 'The version of Terragrunt to use'
+        required: false
+        default: 'latest'
+        type: string
+      tf_working_dir:
+        description: 'The working directory for Terraform'
+        required: true
+        type: string
+
+
+
+jobs:
+  deploy:
+    name: ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      TF_VAR_postgres_connection: ${{ secrets.POSTGRES_CONNECTION }}
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      TF_INPUT: false
+      ARM_USE_CLI: false
+      TERRAGRUNT_AUTO_INIT: false
+      TERRAGRUNT_LOG_LEVEL: error
+    steps:
+      # Terraform deployment
+      - uses: actions/download-artifact@v3
+        with:
+          name: terraform
+          path: ./infrastructure
+      - name: 'Init'
+        uses: the-commons-project/terragrunt-github-actions@master
+        with:
+          tf_actions_version: ${{ inputs.tf_version }}
+          tg_actions_version: ${{ inputs.tg_version }}
+          tf_actions_binary: "terragrunt"
+          tf_actions_subcommand: 'init'
+          tf_actions_working_dir: ${{ inputs.tf_working_dir }}
+      - name: 'Apply'
+        uses: the-commons-project/terragrunt-github-actions@master
+        with:
+          tf_actions_version: ${{ inputs.tf_version }}
+          tg_actions_version: ${{ inputs.tg_version }}
+          tf_actions_binary: "terragrunt"
+          tf_actions_subcommand: 'apply'
+          tf_actions_working_dir: ${{ inputs.tf_working_dir }}
+      - name: 'Output'
+        id: output
+        uses: the-commons-project/terragrunt-github-actions@master
+        with:
+          tf_actions_version: ${{ inputs.tf_version }}
+          tg_actions_version: ${{ inputs.tg_version }}
+          tf_actions_binary: "terragrunt"
+          tf_actions_subcommand: 'output'
+          tf_actions_working_dir: ${{ inputs.tf_working_dir }}
+
+      - name: Set Function App name as Environment Variable
+        run: |
+          echo "LOGIC_APP_RESOURCE_GROUP=${{ fromJson(steps.output.outputs.tf_actions_output).logic_app_resource_group_name.value }}" >> $GITHUB_ENV
+          echo "DATABASE_CONNECTION_NAME=${{ fromJson(steps.output.outputs.tf_actions_output).database_connection_name.value }}" >> $GITHUB_ENV
+      
+      
+      # Function App Deployment
+      - uses: actions/download-artifact@v3
+        with:
+          name: azure_components
+          path: ./AzureComponents
+
+      - uses: Azure/login@v1
+        with:
+          creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
+
+      - name: Logic App
+        uses: azure/arm-deploy@v1
+        with:
+          resourceGroupName: ${{ env.LOGIC_APP_RESOURCE_GROUP }}
+          template: './AzureComponents/TrackImportLogicApp.template.json'
+          parameters: functionAppName=${{ env.FUNCTION_APP_NAME }} connections_sql_name=${{ env.DATABASE_CONNECTION_NAME }}

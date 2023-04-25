@@ -2,11 +2,9 @@ name: CI/CD Function App
 on:
   push:
     paths:
-      - 'Services/Gavinhow.SpotifyStatistics.ImportFunction/**'
-      - 'infrastructure/**/import/**'
-      - '.github/workflows/function_app.yml'
-      - '.github/workflows/function_app-deploy.yml'
-      - '.github/workflows/terraform-deploy.yml'
+      - 'AzureComponents/**'
+      - 'infrastructure/**/logic_app/**'
+      - '.github/workflows/logic_app.yml'
     branches:
       - main
       - feature/deploy_function_app
@@ -19,14 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '6.0.x'
-      - run: dotnet build ./Services/Gavinhow.SpotifyStatistics.ImportFunction/Gavinhow.SpotifyStatistics.ImportFunction.csproj --configuration Release --output ./publish_output
       - uses: actions/upload-artifact@v3
         with:
-          name: import_function_app
-          path: ./publish_output/
+          name: azure_components
+          path: ./AzureComponents/
           if-no-files-found: error
       - uses: actions/upload-artifact@v3
         with:
@@ -40,7 +34,7 @@ jobs:
     uses: ./.github/workflows/function_app-deploy.yml
     with:
       environment: develop
-      tf_working_dir: './infrastructure/live/dev/import'
+      tf_working_dir: './infrastructure/live/dev/logic_app'
     secrets: inherit
   production:
     name: 'Deploy'
@@ -48,5 +42,5 @@ jobs:
     uses: ./.github/workflows/function_app-deploy.yml
     with:
       environment: production
-      tf_working_dir: './infrastructure/live/prod/import'
+      tf_working_dir: './infrastructure/live/prod/logic_app'
     secrets: inherit
