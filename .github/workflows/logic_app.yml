@@ -1,4 +1,4 @@
-name: CI/CD Function App
+name: CI/CD Logic App
 on:
   push:
     paths:
@@ -31,7 +31,7 @@ jobs:
   develop:
     name: 'Deploy'
     needs: [ build ]
-    uses: ./.github/workflows/function_app-deploy.yml
+    uses: ./.github/workflows/logic_app-deploy.yml
     with:
       environment: develop
       tf_working_dir: './infrastructure/live/dev/logic_app'
@@ -39,7 +39,7 @@ jobs:
   production:
     name: 'Deploy'
     needs: [ build, develop ]
-    uses: ./.github/workflows/function_app-deploy.yml
+    uses: ./.github/workflows/logic_app-deploy.yml
     with:
       environment: production
       tf_working_dir: './infrastructure/live/prod/logic_app'
