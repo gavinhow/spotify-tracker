@@ -72,8 +72,8 @@ jobs:
 
       - name: Set Function App name as Environment Variable
         run: |
-          echo "FUNCTION_APP_NAME=${{ fromJson(steps.output.outputs.tf_actions_output).import_function_app_name.value }}" >> $GITHUB_ENV
-          echo "FUNCTION_APP_RESOURCE_GROUP=${{ fromJson(steps.output.outputs.tf_actions_output).import_function_app_resource_group_name.value }}" >> $GITHUB_ENV
+          echo "FUNCTION_APP_NAME=${{ fromJson(steps.output.outputs.tf_actions_output).function_app.value.name }}" >> $GITHUB_ENV
+          echo "FUNCTION_APP_RESOURCE_GROUP=${{ fromJson(steps.output.outputs.tf_actions_output).function_app.value.resource_group_name }}" >> $GITHUB_ENV
       
 
       # Function App Deployment

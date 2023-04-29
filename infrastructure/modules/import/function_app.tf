@@ -41,10 +41,10 @@ resource "azurerm_windows_function_app" "import_function_app" {
   site_config {}
 }
 
-output "import_function_app_name" {
-  value = azurerm_windows_function_app.import_function_app.name
-}
-
-output "import_function_app_resource_group_name" {
-  value = azurerm_windows_function_app.import_function_app.resource_group_name
+output "function_app" {
+  value = {
+    id                  = azurerm_windows_function_app.import_function_app.id
+    name                = azurerm_windows_function_app.import_function_app.name
+    resource_group_name = azurerm_windows_function_app.import_function_app.resource_group_name
+  }
 }

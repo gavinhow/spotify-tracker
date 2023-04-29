@@ -49,10 +49,20 @@ resource "azurerm_api_connection" "postgres_connection" {
   }
 }
 
-output "logic_app_resource_group_name" {
-  value = azurerm_logic_app_workflow.import_logic_app_workflow.resource_group_name
+output "logic_app" {
+  value = {
+    name = azurerm_logic_app_workflow.import_logic_app_workflow.name
+    resource_group_name = azurerm_logic_app_workflow.import_logic_app_workflow.resource_group_name
+  }
 }
 
-output "database_connection_name" {
-  value = azurerm_api_connection.postgres_connection.name
+output "database_api_connection" {
+  value = {
+    id             = azurerm_api_connection.postgres_connection.id
+    managed_api_id = azurerm_api_connection.postgres_connection.managed_api_id
+  }
+}
+
+output "function_app" {
+  value = var.function_app
 }

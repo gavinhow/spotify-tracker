@@ -25,6 +25,10 @@ dependency "db" {
   mock_outputs_allowed_terraform_commands = ["init", "validate"]
 }
 
+dependency "import" {
+  config_path = "../import"
+}
+
 inputs = {
   database = {
     host     = dependency.db.outputs.database.host
@@ -32,4 +36,5 @@ inputs = {
     username = dependency.db.outputs.database.username
     password = dependency.db.outputs.database.password
   }
+  function_app = dependency.import.outputs.function_app
 }

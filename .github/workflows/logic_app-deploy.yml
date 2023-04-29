@@ -72,10 +72,13 @@ jobs:
 
       - name: Set Function App name as Environment Variable
         run: |
-          echo "LOGIC_APP_RESOURCE_GROUP=${{ fromJson(steps.output.outputs.tf_actions_output).logic_app_resource_group_name.value }}" >> $GITHUB_ENV
-          echo "DATABASE_CONNECTION_NAME=${{ fromJson(steps.output.outputs.tf_actions_output).database_connection_name.value }}" >> $GITHUB_ENV
-      
-      
+          echo "LOGIC_APP_NAME=${{ fromJson(steps.output.outputs.tf_actions_output).logic_app.value.name }}" >> $GITHUB_ENV
+          echo "LOGIC_APP_RESOURCE_GROUP=${{ fromJson(steps.output.outputs.tf_actions_output).logic_app.value.resource_group_name }}" >> $GITHUB_ENV
+          echo "DATABASE_API_CONNECTION_ID=${{ fromJson(steps.output.outputs.tf_actions_output).database_api_connection.value.id }}" >> $GITHUB_ENV
+          echo "DATABASE_API_CONNECTION_MANAGED_API_ID=${{ fromJson(steps.output.outputs.tf_actions_output).database_api_connection.value.managed_api_id }}" >> $GITHUB_ENV
+          echo "FUNCTION_APP_ID=${{ fromJson(steps.output.outputs.tf_actions_output).function_app.value.id }}" >> $GITHUB_ENV
+
+
       # Function App Deployment
       - uses: actions/download-artifact@v3
         with:
@@ -91,4 +94,4 @@ jobs:
         with:
           resourceGroupName: ${{ env.LOGIC_APP_RESOURCE_GROUP }}
           template: './AzureComponents/TrackImportLogicApp.template.json'
-          parameters: functionAppName=${{ env.FUNCTION_APP_NAME }} connections_sql_name=${{ env.DATABASE_CONNECTION_NAME }}
+          parameters: logicAppName=${{ env.LOGIC_APP_NAME }} ImportFunction_ExternalId=${{ env.FUNCTION_APP_ID }} postgresql_connection_externalid=${{ env.DATABASE_API_CONNECTION_ID }} postgresql_managed_api_id=${{ env.DATABASE_API_CONNECTION_MANAGED_API_ID }}

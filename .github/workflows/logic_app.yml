@@ -39,6 +39,7 @@ jobs:
   production:
     name: 'Deploy'
     needs: [ build, develop ]
+    if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/logic_app-deploy.yml
     with:
       environment: production

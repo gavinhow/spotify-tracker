@@ -9,7 +9,6 @@ on:
       - '.github/workflows/terraform-deploy.yml'
     branches:
       - main
-      - feature/deploy_function_app
 
   workflow_dispatch:
 
@@ -45,6 +44,7 @@ jobs:
   production:
     name: 'Deploy'
     needs: [ build, develop ]
+    if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/function_app-deploy.yml
     with:
       environment: production
