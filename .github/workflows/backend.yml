@@ -36,3 +36,12 @@ jobs:
           name: terraform
           path: './infrastructure/'
           if-no-files-found: error
+
+  develop:
+    name: 'Deploy'
+    needs: [ build ]
+    uses: ./.github/workflows/backend-deploy.yml
+    with:
+      environment: develop
+      tf_working_dir: './infrastructure/live/dev/backend'
+    secrets: inherit
