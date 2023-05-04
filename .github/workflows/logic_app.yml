@@ -5,6 +5,7 @@ on:
       - 'AzureComponents/**'
       - 'infrastructure/**/logic_app/**'
       - '.github/workflows/logic_app.yml'
+      - '.github/workflows/logic_app-deploy.yml'
     branches:
       - main
 
