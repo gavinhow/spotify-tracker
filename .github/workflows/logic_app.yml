@@ -7,7 +7,6 @@ on:
       - '.github/workflows/logic_app.yml'
     branches:
       - main
-      - feature/deploy_function_app
 
   workflow_dispatch:
 
