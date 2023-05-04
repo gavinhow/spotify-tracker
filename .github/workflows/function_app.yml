@@ -1,0 +1,52 @@
+name: CI/CD Function App
+on:
+  push:
+    paths:
+      - 'Services/Gavinhow.SpotifyStatistics.ImportFunction/**'
+      - 'infrastructure/**/import/**'
+      - '.github/workflows/function_app.yml'
+      - '.github/workflows/function_app-deploy.yml'
+      - '.github/workflows/terraform-deploy.yml'
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.0.x'
+      - run: dotnet build ./Services/Gavinhow.SpotifyStatistics.ImportFunction/Gavinhow.SpotifyStatistics.ImportFunction.csproj --configuration Release --output ./publish_output
+      - uses: actions/upload-artifact@v3
+        with:
+          name: import_function_app
+          path: ./publish_output/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v3
+        with:
+          name: terraform
+          path: './infrastructure/'
+          if-no-files-found: error
+
+  develop:
+    name: 'Deploy'
+    needs: [ build ]
+    uses: ./.github/workflows/function_app-deploy.yml
+    with:
+      environment: develop
+      tf_working_dir: './infrastructure/live/dev/import'
+    secrets: inherit
+  production:
+    name: 'Deploy'
+    needs: [ build, develop ]
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/function_app-deploy.yml
+    with:
+      environment: production
+      tf_working_dir: './infrastructure/live/prod/import'
+    secrets: inherit

@@ -1,0 +1,46 @@
+name: CI/CD Logic App
+on:
+  push:
+    paths:
+      - 'AzureComponents/**'
+      - 'infrastructure/**/logic_app/**'
+      - '.github/workflows/logic_app.yml'
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/upload-artifact@v3
+        with:
+          name: azure_components
+          path: ./AzureComponents/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v3
+        with:
+          name: terraform
+          path: './infrastructure/'
+          if-no-files-found: error
+
+  develop:
+    name: 'Deploy'
+    needs: [ build ]
+    uses: ./.github/workflows/logic_app-deploy.yml
+    with:
+      environment: develop
+      tf_working_dir: './infrastructure/live/dev/logic_app'
+    secrets: inherit
+  production:
+    name: 'Deploy'
+    needs: [ build, develop ]
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/logic_app-deploy.yml
+    with:
+      environment: production
+      tf_working_dir: './infrastructure/live/prod/logic_app'
+    secrets: inherit

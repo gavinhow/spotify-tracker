@@ -1,13 +1,9 @@
-name: 'Terraform Deploy'
+name: 'Logic App Deploy'
 on:
   workflow_call:
     inputs:
       environment:
         description: 'The environment to deploy to'
-        required: true
-        type: string
-      tf_working_dir:
-        description: 'The working directory for Terraform'
         required: true
         type: string
       tf_version:
@@ -20,13 +16,15 @@ on:
         required: false
         default: 'latest'
         type: string
-    outputs:
-      tf_actions_output:
-        description: 'Output from tf output'
-        value: ${{ jobs.apply_terragrunt.outputs.tf_actions_output }}
+      tf_working_dir:
+        description: 'The working directory for Terraform'
+        required: true
+        type: string
+
+
 
 jobs:
-  apply_terragrunt:
+  deploy:
     name: ${{ inputs.environment }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
@@ -40,9 +38,8 @@ jobs:
       ARM_USE_CLI: false
       TERRAGRUNT_AUTO_INIT: false
       TERRAGRUNT_LOG_LEVEL: error
-    outputs:
-      tf_actions_output: ${{ steps.output.outputs.tf_actions_output }}
     steps:
+      # Terraform deployment
       - uses: actions/download-artifact@v3
         with:
           name: terraform
@@ -72,3 +69,29 @@ jobs:
           tf_actions_binary: "terragrunt"
           tf_actions_subcommand: 'output'
           tf_actions_working_dir: ${{ inputs.tf_working_dir }}
+
+      - name: Set Function App name as Environment Variable
+        run: |
+          echo "LOGIC_APP_NAME=${{ fromJson(steps.output.outputs.tf_actions_output).logic_app.value.name }}" >> $GITHUB_ENV
+          echo "LOGIC_APP_RESOURCE_GROUP=${{ fromJson(steps.output.outputs.tf_actions_output).logic_app.value.resource_group_name }}" >> $GITHUB_ENV
+          echo "DATABASE_API_CONNECTION_ID=${{ fromJson(steps.output.outputs.tf_actions_output).database_api_connection.value.id }}" >> $GITHUB_ENV
+          echo "DATABASE_API_CONNECTION_MANAGED_API_ID=${{ fromJson(steps.output.outputs.tf_actions_output).database_api_connection.value.managed_api_id }}" >> $GITHUB_ENV
+          echo "FUNCTION_APP_ID=${{ fromJson(steps.output.outputs.tf_actions_output).function_app.value.id }}" >> $GITHUB_ENV
+
+
+      # Function App Deployment
+      - uses: actions/download-artifact@v3
+        with:
+          name: azure_components
+          path: ./AzureComponents
+
+      - uses: Azure/login@v1
+        with:
+          creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
+
+      - name: Logic App
+        uses: azure/arm-deploy@v1
+        with:
+          resourceGroupName: ${{ env.LOGIC_APP_RESOURCE_GROUP }}
+          template: './AzureComponents/TrackImportLogicApp.template.json'
+          parameters: logicAppName=${{ env.LOGIC_APP_NAME }} ImportFunction_ExternalId=${{ env.FUNCTION_APP_ID }} postgresql_connection_externalid=${{ env.DATABASE_API_CONNECTION_ID }} postgresql_managed_api_id=${{ env.DATABASE_API_CONNECTION_MANAGED_API_ID }}

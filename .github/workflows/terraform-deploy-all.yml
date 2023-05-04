@@ -20,10 +20,6 @@ on:
         required: false
         default: 'latest'
         type: string
-    outputs:
-      tf_actions_output:
-        description: 'Output from tf output'
-        value: ${{ jobs.apply_terragrunt.outputs.tf_actions_output }}
 
 jobs:
   apply_terragrunt:
@@ -39,20 +35,14 @@ jobs:
       TF_INPUT: false
       ARM_USE_CLI: false
       TERRAGRUNT_AUTO_INIT: false
-      TERRAGRUNT_LOG_LEVEL: error
-    outputs:
-      tf_actions_output: ${{ steps.output.outputs.tf_actions_output }}
     steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: terraform
-          path: ./infrastructure
+      - uses: actions/checkout@v3
       - name: 'Init'
         uses: the-commons-project/terragrunt-github-actions@master
         with:
           tf_actions_version: ${{ inputs.tf_version }}
           tg_actions_version: ${{ inputs.tg_version }}
-          tf_actions_binary: "terragrunt"
+          tf_actions_binary: "terragrunt run-all"
           tf_actions_subcommand: 'init'
           tf_actions_working_dir: ${{ inputs.tf_working_dir }}
       - name: 'Apply'
@@ -60,15 +50,6 @@ jobs:
         with:
           tf_actions_version: ${{ inputs.tf_version }}
           tg_actions_version: ${{ inputs.tg_version }}
-          tf_actions_binary: "terragrunt"
+          tf_actions_binary: "terragrunt run-all"
           tf_actions_subcommand: 'apply'
-          tf_actions_working_dir: ${{ inputs.tf_working_dir }}
-      - name: 'Output'
-        id: output
-        uses: the-commons-project/terragrunt-github-actions@master
-        with:
-          tf_actions_version: ${{ inputs.tf_version }}
-          tg_actions_version: ${{ inputs.tg_version }}
-          tf_actions_binary: "terragrunt"
-          tf_actions_subcommand: 'output'
           tf_actions_working_dir: ${{ inputs.tf_working_dir }}

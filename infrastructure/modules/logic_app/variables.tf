@@ -31,3 +31,11 @@ variable database {
   sensitive   = true
   description = "The database connection details."
 }
+
+variable function_app {
+  type = object({
+    id = string
+    name = string
+  })
+  description = "The function app configuration."
+}

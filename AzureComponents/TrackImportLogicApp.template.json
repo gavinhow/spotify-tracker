@@ -1,9 +1,9 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "connections_sql_name": {
-      "defaultValue": "sql",
+    "logicAppName": {
+      "defaultValue": "UserImportTrigger",
       "type": "string"
     },
     "location": {
@@ -13,9 +13,14 @@
         "description": "Location for all resources."
       }
     },
-    "functionAppName": {
-      "type": "string",
-      "defaultValue": "SpotifyImportFunction"
+    "ImportFunction_ExternalId": {
+      "type": "string"
+    },
+    "postgresql_connection_externalid": {
+      "type": "string"
+    },
+    "postgresql_managed_api_id": {
+      "type": "string"
     }
   },
   "variables": {},
@@ -23,7 +28,7 @@
     {
       "type": "Microsoft.Logic/workflows",
       "apiVersion": "2017-07-01",
-      "name": "UserImportTrigger",
+      "name": "[parameters('logicAppName')]",
       "location": "[parameters('location')]",
       "properties": {
         "state": "Enabled",
@@ -42,19 +47,23 @@
                 "frequency": "Minute",
                 "interval": 25
               },
+              "evaluatedRecurrence": {
+                "frequency": "Minute",
+                "interval": 25
+              },
               "type": "Recurrence"
             }
           },
           "actions": {
             "For_each": {
-              "foreach": "@body('Get_rows_(V2)')?['value']",
+              "foreach": "@body('Get_rows')?['value']",
               "actions": {
                 "ImportUserHistory": {
                   "runAfter": {},
                   "type": "Function",
                   "inputs": {
                     "function": {
-                      "id": "[concat(resourceGroup().id,'/providers/Microsoft.Web/sites/',parameters('functionAppName'), '/functions/ImportUserHistory')]"
+                      "id": "[concat(parameters('ImportFunction_ExternalId'), '/functions/ImportUserHistory')]"
                     },
                     "queries": {
                       "userid": "@{items('For_each')?['Id']}"
@@ -68,23 +77,23 @@
                 }
               },
               "runAfter": {
-                "Get_rows_(V2)": [
+                "Get_rows": [
                   "Succeeded"
                 ]
               },
               "type": "Foreach"
             },
-            "Get_rows_(V2)": {
+            "Get_rows": {
               "runAfter": {},
               "type": "ApiConnection",
               "inputs": {
                 "host": {
                   "connection": {
-                    "name": "@parameters('$connections')['sql']['connectionId']"
+                    "name": "@parameters('$connections')['postgresql']['connectionId']"
                   }
                 },
                 "method": "get",
-                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('default'))},@{encodeURIComponent(encodeURIComponent('default'))}/tables/@{encodeURIComponent(encodeURIComponent('[SpotifyTracker].[Users]'))}/items"
+                "path": "/datasets/default/tables/@{encodeURIComponent(encodeURIComponent('[SpotifyTracker].[Users]'))}/items"
               }
             },
             "ImportTrackInformation": {
@@ -99,7 +108,7 @@
               "type": "Function",
               "inputs": {
                 "function": {
-                  "id": "[concat(resourceGroup().id,'/providers/Microsoft.Web/sites/',parameters('functionAppName'), '/functions/ImportTrackInformation')]"
+                  "id": "[concat(parameters('ImportFunction_ExternalId'), '/functions/ImportTrackInformation')]"
                 },
                 "retryPolicy": {
                   "type": "none"
@@ -112,29 +121,13 @@
         "parameters": {
           "$connections": {
             "value": {
-              "sql": {
-                "connectionId": "[concat(resourceGroup().id,'/providers/Microsoft.Web/connections/', parameters('connections_sql_name'))]",
-                "connectionName": "sql",
-                "id": "[concat('/subscriptions/',subscription().subscriptionId,'/providers/Microsoft.Web/locations/',parameters('location'),'/managedApis/',parameters('connections_sql_name'))]"
+              "postgresql": {
+                "connectionId": "[parameters('postgresql_connection_externalid')]",
+                "connectionName": "postgresql",
+                "id": "[parameters('postgresql_managed_api_id')]"
               }
             }
           }
-        }
-      },
-      "dependsOn": [
-        "[parameters('connections_sql_name')]"
-      ]
-    },
-    {
-      "type": "Microsoft.Web/connections",
-      "apiVersion": "2016-06-01",
-      "name": "[parameters('connections_sql_name')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "displayName": "SpotifyTracker spotitrack-dev.database.windows.net",
-        "customParameterValues": {},
-        "api": {
-          "id": "[concat('/subscriptions/',subscription().subscriptionId,'/providers/Microsoft.Web/locations/',parameters('location'),'/managedApis/', parameters('connections_sql_name'))]"
         }
       }
     }
