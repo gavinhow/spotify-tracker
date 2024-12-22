@@ -51,7 +51,7 @@ resource "azurerm_api_connection" "postgres_connection" {
 
 output "logic_app" {
   value = {
-    name = azurerm_logic_app_workflow.import_logic_app_workflow.name
+    name                = azurerm_logic_app_workflow.import_logic_app_workflow.name
     resource_group_name = azurerm_logic_app_workflow.import_logic_app_workflow.resource_group_name
   }
 }
