@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '8.0.x'
       - run: dotnet build ./Services/Gavinhow.SpotifyStatistics.Web/Gavinhow.SpotifyStatistics.Web.csproj --configuration Release --output ./publish_output
       - uses: actions/upload-artifact@v3
         with:
