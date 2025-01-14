@@ -7,18 +7,18 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get('code')
 
   if (!code) {
-    return redirect("http://localhost:3000");
+    return redirect("/");
   }
 
   const response = await fetch(process.env.NEXT_PUBLIC_API_URL + `/user/authenticate?code=${code}`);
 
   if (!response.ok) {
-    return redirect("http://localhost:3000");
+    return redirect("/");
   }
 
   const user = await response.json() as User;
 
   const cookieStore = await cookies();
   cookieStore.set('token', JSON.stringify(user), { path: '/', httpOnly: true }); // Set the cookie with secure options
-  return redirect('http://localhost:3000'); // Redirect to homepage
+  return redirect('/'); // Redirect to homepage
 }

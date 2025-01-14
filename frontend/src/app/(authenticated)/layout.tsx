@@ -60,18 +60,20 @@ const AuthenticatedLayout = async ({ children }: { children: React.ReactNode }) 
           <SidebarProvider>
             <AppSidebar user={user}/>
             <SidebarInset>
-              <header
-                className="px-4 mt-2 flex h-16 shrink-0 items-center gap-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-                <SidebarTrigger className="block md:hidden [&_svg]:size-8 h-auto w-auto"/>
-                <div className="h-full py-2 shrink block md:hidden">
-                  <Separator orientation="vertical"/>
-                </div>
-                <div className="flex flex-1 items-center gap-2">
-                  <DateRangeFilter/>
-                  <UserSwitcher/>
-                </div>
-              </header>
-              {children}
+              <div className="max-w-screen-md">
+                <header
+                  className="px-4 mt-2 flex h-16 shrink-0 items-center gap-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+                  <SidebarTrigger className="block md:hidden [&_svg]:size-8 h-auto w-auto"/>
+                  <div className="h-full py-2 shrink block md:hidden">
+                    <Separator orientation="vertical"/>
+                  </div>
+                  <div className="flex flex-1 items-center gap-2">
+                    <DateRangeFilter/>
+                    <UserSwitcher/>
+                  </div>
+                </header>
+                {children}
+              </div>
             </SidebarInset>
           </SidebarProvider>
         </GlobalFilterProvider>
