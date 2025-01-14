@@ -1,11 +1,14 @@
-version: "3"
 services:
-  web:
-    build: ./Gavinhow.SpotifyStatistics.Web/
-    restart: on-failure
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: spotify
     ports:
-     - "8080:80"
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
-  # backend:
-  #   build: ./Gavinhow.SpotifyStatistics.Backend/
-  #   restart: on-failure
+volumes:
+  postgres_data:
