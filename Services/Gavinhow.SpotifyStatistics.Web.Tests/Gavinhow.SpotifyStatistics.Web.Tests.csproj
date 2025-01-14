@@ -28,7 +28,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Gavinhow.SpotifyStatistics.Web\Gavinhow.SpotifyStatistics.Web.csproj" />
+      <ProjectReference Include="..\Gavinhow.SpotifyStatistics.WebOld\Gavinhow.SpotifyStatistics.WebOld.csproj" />
     </ItemGroup>
 
 </Project>
