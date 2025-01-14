@@ -100,5 +100,13 @@ namespace Gavinhow.SpotifyStatistics.Api
                 {TokenType = token.TokenType, AccessToken = token.AccessToken};
             return (await api.GetSeveralAlbumsAsync(albumIds)).Albums;
         }
+
+        public async Task<PublicProfile> GetPublicProfileAsync(string userId)
+        {
+            Token token = await GetCredentialsToken();
+            SpotifyWebAPI api = new SpotifyWebAPI
+                {TokenType = token.TokenType, AccessToken = token.AccessToken};
+            return await api.GetPublicProfileAsync(userId);
+        }
     }
 }
