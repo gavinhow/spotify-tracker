@@ -1,7 +1,7 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gavinhow.SpotifyStatistics.Web", "Gavinhow.SpotifyStatistics.Web\Gavinhow.SpotifyStatistics.Web.csproj", "{586D4118-EDFD-492E-AB76-85CBFF29A752}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gavinhow.SpotifyStatistics.WebOld", "Gavinhow.SpotifyStatistics.WebOld\Gavinhow.SpotifyStatistics.WebOld.csproj", "{586D4118-EDFD-492E-AB76-85CBFF29A752}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gavinhow.SpotifyStatistics.Database", "Gavinhow.SpotifyStatistics.Database\Gavinhow.SpotifyStatistics.Database.csproj", "{BB0B9C65-24DE-439D-835B-893617A39362}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gavinhow.SpotifyStatistics.ImportFunction", "Gavinhow.SpotifyStatistics.ImportFunction\Gavinhow.SpotifyStatistics.ImportFunction.csproj", "{D10474E6-0034-4821-87D7-F8DC553A50AC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gavinhow.SpotifyStatistics.Web.Tests", "Gavinhow.SpotifyStatistics.Web.Tests\Gavinhow.SpotifyStatistics.Web.Tests.csproj", "{6B4A8D1B-88FD-4BAE-8105-58AF461C9175}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gavinhow.SpotifyStatistics.Web", "Gavinhow.SpotifyStatistics.Web\Gavinhow.SpotifyStatistics.Web.csproj", "{7350EFD8-E547-45A5-A9CB-E54E90275AF5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,5 +45,9 @@ Global
 		{6B4A8D1B-88FD-4BAE-8105-58AF461C9175}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B4A8D1B-88FD-4BAE-8105-58AF461C9175}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B4A8D1B-88FD-4BAE-8105-58AF461C9175}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7350EFD8-E547-45A5-A9CB-E54E90275AF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7350EFD8-E547-45A5-A9CB-E54E90275AF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7350EFD8-E547-45A5-A9CB-E54E90275AF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7350EFD8-E547-45A5-A9CB-E54E90275AF5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
