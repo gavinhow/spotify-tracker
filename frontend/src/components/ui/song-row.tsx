@@ -1,5 +1,4 @@
-import React, { HTMLAttributes } from 'react';
-import Image, { ImageProps } from 'next/image';
+import React, { HTMLAttributes, ImgHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
 const SongRow = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => {
@@ -10,10 +9,10 @@ const SongRow = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => {
 }
 SongRow.displayName = 'SongRow';
 
-const SongRowImage = ({ className, alt, ...props }: ImageProps) => {
+const SongRowImage = ({ className, alt, ...props }: ImgHTMLAttributes<HTMLImageElement>) => {
   return (
     <div className={cn('h-16 w-16 relative rounded-xl overflow-hidden shrink-0 hidden @xs:block', className)}>
-      <Image sizes="64px" style={{ objectFit: 'cover' }} alt={alt} fill={true} {...props} />
+      <img sizes="64px" style={{ objectFit: 'cover' }} alt={alt} className="absolute h-full w-full" {...props} />
     </div>
   )
 }

@@ -1,7 +1,6 @@
 import React from 'react';
 import { gql } from '@/__generated__';
 import { getClient } from '@/lib/client';
-import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 
 const query = gql(/* GraphQL */`
@@ -33,7 +32,7 @@ const AlbumNameAndPicture = async ({ albumId }: AlbumNameAndPictureProps) => {
         {data.album.name}
       </div>
       <Card className="shadow-none border-0 aspect-square w-full relative rounded-md overflow-hidden">
-        <Image priority src={data.album.imageUrl} fill={true} style={{
+        <img fetchPriority="high" className="absolute h-full w-full"  src={data.album.imageUrl} style={{
           objectFit: 'cover',
         }} alt={data.album.name}/>
       </Card>

@@ -1,6 +1,5 @@
 import React, { HTMLAttributes } from 'react';
 import { Card } from '@/components/ui/card';
-import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { gql } from '@/__generated__';
 import { getClient } from '@/lib/client';
@@ -53,7 +52,7 @@ const TopArtistCard = async ({
   return (
     <LinkWithGlobalFilters href={`/artist/${topArtist?.artistId}`}>
       <Card className={cn('aspect-square relative overflow-hidden border-0', className)} {...props}>
-        <Image priority={true} sizes="512px" src={imageUrl} style={{ objectFit: 'cover' }} alt={name} fill={true}/>
+        <img fetchPriority="high" sizes="512px" src={imageUrl} style={{ objectFit: 'cover' }} alt={name} className="absolute h-full w-full" />
         <div style={{
           mask: 'linear-gradient(transparent, black, black)'
         }} className="absolute inset-x-0 bottom-0 h-1/3 backdrop-blur-lg"/>

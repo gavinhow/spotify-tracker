@@ -1,7 +1,6 @@
 import React from 'react';
 import { gql } from '@/__generated__';
 import { getClient } from '@/lib/client';
-import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 import { TrackPageParams } from '@/app/(authenticated)/track/[trackId]/page';
 import { GlobalFilters } from '@/lib/GlobalFilters/GlobalFilters';
@@ -34,7 +33,7 @@ const AlbumNameAndPicture = async ({ trackId, user, from, to }: TrackPageParams 
       </div>
       <div className="flex">
         <Card className="w-1/3 shadow-none border-0 aspect-square relative rounded-md overflow-hidden">
-          <Image priority src={data.track.albumArtUrl} fill={true} style={{
+          <img className="absolute h-full w-full" fetchPriority="high" src={data.track.albumArtUrl} style={{
             objectFit: 'cover',
           }} alt={data.track.name}/>
         </Card>

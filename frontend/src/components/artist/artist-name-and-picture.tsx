@@ -1,7 +1,6 @@
 import React from 'react';
 import { gql } from '@/__generated__';
 import { getClient } from '@/lib/client';
-import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 
 const query = gql(/* GraphQL */`
@@ -32,7 +31,7 @@ const ArtistNameAndPicture = async ({ artistId }: ArtistNameAndPictureProps) => 
         {data.artist.name}
       </div>
       <Card className="shadow-none border-0 aspect-square w-full relative rounded-md overflow-hidden">
-        <Image src={data.artist.imageUrl} fill={true} style={{
+        <img src={data.artist.imageUrl} className="absolute h-full w-full" style={{
           objectFit: 'cover',
         }} alt={data.artist.name}/>
       </Card>
