@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils';
 import { ArrowUp, ChevronRight } from 'lucide-react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { SongRow, SongRowImage, SongRowPlayCount } from '@/components/ui/song-row';
-import Link from 'next/link';
 import LinkWithGlobalFilters from '@/components/link-global-filters/link-global-filters';
 
 

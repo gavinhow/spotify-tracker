@@ -6,14 +6,6 @@ import { NetworkError } from '@apollo/client/errors';
 import { ApolloNextAppProvider,InMemoryCache,  ApolloClient } from '@apollo/experimental-nextjs-app-support';
 import { useDemo } from '@/lib/DemoProvider/demo-provider-client';
 
-const responseLogger = new ApolloLink((operation, forward) => {
-  return forward(operation).map(result => {
-    console.info(JSON.stringify(result));
-    return result
-  })
-})
-
-
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (isServerError(networkError) && networkError.statusCode === 401) {
     // Handle 401: Redirect to login, refresh token, etc.

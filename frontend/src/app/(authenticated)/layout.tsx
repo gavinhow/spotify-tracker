@@ -11,7 +11,6 @@ import DemoProvider from '@/lib/DemoProvider/demo-provider';
 import { headers } from 'next/headers';
 import { gql } from '@/__generated__';
 import { AuthSafeQuery } from '@/lib/authSafeQuery';
-import { getGlobalFiltersOrDefault } from '@/lib/GlobalFilters/getGlobalFiltersOrDefault';
 import { CircleCheckBig } from 'lucide-react';
 
 const query = gql(/* GraphQL */`

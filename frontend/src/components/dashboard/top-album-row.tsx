@@ -1,4 +1,4 @@
-import React, { HTMLAttributes } from 'react';
+import React from 'react';
 import { SongRow, SongRowImage, SongRowPlayCount } from '@/components/ui/song-row';
 
 interface TopAlbumRowProps {

@@ -1,7 +1,6 @@
 'use client'
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import Link from 'next/link';
 import { PlusCircle } from 'lucide-react';
 import { useGlobalFilter } from '@/components/top-navbar/GlobalFilterProvider';
 import { cn } from '@/lib/utils';

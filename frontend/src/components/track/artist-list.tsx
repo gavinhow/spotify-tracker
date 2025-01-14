@@ -3,7 +3,6 @@ import { gql } from '@/__generated__';
 import { getClient } from '@/lib/client';
 import { SongRow, SongRowImage } from '@/components/ui/song-row';
 import { ChevronRight } from 'lucide-react';
-import Link from 'next/link';
 import { TrackPageParams } from '@/app/(authenticated)/track/[trackId]/page';
 import LinkWithGlobalFilters from '@/components/link-global-filters/link-global-filters';
 

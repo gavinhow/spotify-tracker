@@ -5,12 +5,6 @@ import { onError } from '@apollo/client/link/error';
 import { NetworkError } from '@apollo/client/errors';
 import { headers } from 'next/headers';
 
-const responseLogger = new ApolloLink((operation, forward) => {
-  return forward(operation).map(result => {
-    console.info(JSON.stringify(result));
-    return result
-  })
-})
 
 const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
   if (isServerError(networkError) && networkError.statusCode === 401) {

@@ -48,11 +48,6 @@ const getLastNDaysRange = (n: number) => {
   return { from: startDate, to: today };
 };
 
-const getYearToDateRange = () => {
-  const today = new Date();
-  const startDate = new Date(today.getFullYear(), 0, 1);
-  return { from: startDate, to: today };
-};
 
 const getAllTimeRange = () => {
   return { from: new Date(0), to: new Date() };

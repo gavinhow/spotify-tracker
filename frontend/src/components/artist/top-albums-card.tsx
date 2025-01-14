@@ -6,7 +6,6 @@ import { Card } from '@/components/ui/card';
 import { GlobalFilters } from '@/lib/GlobalFilters/GlobalFilters';
 import { ArtistPageParams } from '@/app/(authenticated)/artist/[artistId]/page';
 import { LargeTopAlbumRow, SmallTopAlbumRow } from '@/components/dashboard/top-album-row';
-import Link from 'next/link';
 import LinkWithGlobalFilters from '../link-global-filters/link-global-filters';
 
 

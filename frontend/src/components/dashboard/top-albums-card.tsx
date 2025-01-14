@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 import { LargeTopAlbumRow, SmallTopAlbumRow } from './top-album-row';
 import { GlobalFilters } from '@/lib/GlobalFilters/GlobalFilters';
-import Link from 'next/link';
 import LinkWithGlobalFilters from '@/components/link-global-filters/link-global-filters';
 
 

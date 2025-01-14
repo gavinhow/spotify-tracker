@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils';
 import { LargeTopSongRow, SmallTopSongRow } from '@/components/dashboard/top-song-row';
 import { GlobalFilters } from '@/lib/GlobalFilters/GlobalFilters';
 import { ArtistPageParams } from '@/app/(authenticated)/artist/[artistId]/page';
-import Link from 'next/link';
 import LinkWithGlobalFilters from '@/components/link-global-filters/link-global-filters';
 
 const query = gql(/* GraphQL */`

@@ -7,7 +7,7 @@ import { ApolloError, NetworkError } from '@apollo/client/errors';
 import { ServerError } from '@apollo/client';
 
 
-export async function AuthSafeQuery<T = any, TVariables extends OperationVariables = OperationVariables>(options: QueryOptions<TVariables, T>): Promise<ApolloQueryResult<MaybeMasked<T>>> {
+export async function AuthSafeQuery<T = unknown, TVariables extends OperationVariables = OperationVariables>(options: QueryOptions<TVariables, T>): Promise<ApolloQueryResult<MaybeMasked<T>>> {
   let response: ApolloQueryResult<MaybeMasked<T>>;
   try {
     response = await (await getClient()).query(options)
