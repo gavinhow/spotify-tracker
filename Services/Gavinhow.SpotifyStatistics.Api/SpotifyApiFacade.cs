@@ -66,15 +66,23 @@ namespace Gavinhow.SpotifyStatistics.Api
 
         public async Task<List<FullTrack>> GetSeveralTracksAsync(List<string> trackIds)
         {
+            if (trackIds.Count > 50)
+                throw new ArgumentException("Can only get 50 tracks at a time");
             Token token = await GetCredentialsToken();
             SpotifyWebAPI api = new SpotifyWebAPI
                 {TokenType = token.TokenType, AccessToken = token.AccessToken};
-            return (await api.GetSeveralTracksAsync(trackIds)).Tracks;
+            var response = await api.GetSeveralTracksAsync(trackIds);
+            if (response.HasError())
+                throw new Exception(response.Error.Message);
+            else
+                return response.Tracks;
         }
 
         
         public async Task<List<FullArtist>> GetArtistsAsync(List<string> artistIds)
         {
+            if (artistIds.Count > 50)
+                throw new ArgumentException("Can only get 50 artists at a time");
             Token token = await GetCredentialsToken();
             SpotifyWebAPI api = new SpotifyWebAPI
                 {TokenType = token.TokenType, AccessToken = token.AccessToken};
@@ -85,6 +93,8 @@ namespace Gavinhow.SpotifyStatistics.Api
         
         public async Task<List<FullAlbum>> GetAlbumsAsync(List<string> albumIds)
         {
+            if (albumIds.Count > 20)
+                throw new ArgumentException("Can only get 20 albums at a time");
             Token token = await GetCredentialsToken();
             SpotifyWebAPI api = new SpotifyWebAPI
                 {TokenType = token.TokenType, AccessToken = token.AccessToken};
