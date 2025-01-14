@@ -1,0 +1,4 @@
+schema:
+  - "http://localhost:6969/graphql":
+      headers: { ApiKey: "DEMO" }
+documents: '**/*.graphql'
