@@ -35,6 +35,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Gavinhow.SpotifyStatistics.Api\Gavinhow.SpotifyStatistics.Api.csproj" />
       <ProjectReference Include="..\Gavinhow.SpotifyStatistics.Database.Entity\Gavinhow.SpotifyStatistics.Database.Entity.csproj" />
+      <ProjectReference Include="..\Gavinhow.SpotifyStatistics.Database\Gavinhow.SpotifyStatistics.Database.csproj" />
     </ItemGroup>
 
 </Project>
