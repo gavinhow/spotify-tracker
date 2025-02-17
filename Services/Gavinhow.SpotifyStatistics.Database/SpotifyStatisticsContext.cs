@@ -28,6 +28,15 @@ namespace Gavinhow.SpotifyStatistics.Database
             modelBuilder.Entity<ArtistAlbum>().HasKey(c => new { c.AlbumId, c.ArtistId });
             modelBuilder.Entity<ArtistTrack>().HasKey(c => new { c.ArtistId, c.TrackId });
             modelBuilder.Entity<Friend>().HasKey(c => new { c.UserId, c.FriendId });
+            modelBuilder.Entity<Play>()
+                .Property<string>("TrackId");
+
+            modelBuilder.Entity<Play>()
+                .HasOne(p => p.Track)
+                .WithMany()
+                .HasForeignKey(p => p.TrackId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .IsRequired(false);
 
             base.OnModelCreating(modelBuilder);
         }
