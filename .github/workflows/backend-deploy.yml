@@ -38,7 +38,7 @@ jobs:
       TERRAGRUNT_LOG_LEVEL: error
     steps:
       # Terraform deployment
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: terraform
           path: ./infrastructure
@@ -74,7 +74,7 @@ jobs:
           echo "APP_RESOURCE_GROUP=${{ fromJson(steps.output.outputs.tf_actions_output).backend.value.resource_group_name }}" >> $GITHUB_ENV
 
       # Azure App Service Deployment
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: spotify_statistics_web
           path: ./azure_app
