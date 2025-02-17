@@ -26,12 +26,12 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - run: dotnet build ./Services/Gavinhow.SpotifyStatistics.Web/Gavinhow.SpotifyStatistics.Web.csproj --configuration Release --output ./publish_output
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: spotify_statistics_web
           path: './publish_output/'
           if-no-files-found: error
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: terraform
           path: './infrastructure/'
