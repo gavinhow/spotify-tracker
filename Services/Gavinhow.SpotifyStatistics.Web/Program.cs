@@ -84,6 +84,10 @@ builder
 
 builder.Services.AddDistributedMemoryCache();
 
+// Add health checks
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<SpotifyStatisticsContext>("database");
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -92,10 +96,10 @@ if (app.Environment.IsDevelopment())
   app.MapNitroApp();
 }
 
-if (app.Environment.IsProduction())
-{
-  app.UseHttpsRedirection();
-}
+// if (app.Environment.IsProduction())
+// {
+//   app.UseHttpsRedirection();
+// }
 
 app.UseCors(MyAllowSpecificOrigins);
 app.UseRouting();
@@ -103,6 +107,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapGraphQLHttp().RequireAuthorization("ApiKeyOrBearer");
 app.MapControllers();
+
+// Map health check endpoint
+app.MapHealthChecks("/health");
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 

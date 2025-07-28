@@ -69,9 +69,15 @@ namespace Gavinhow.SpotifyStatistics.Database
 
     public static class DbSetExtensions
     {
-        public static Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<T> AddIfNotExists<T>(this DbSet<T> dbSet, T entity, Expression<Func<T, bool>> predicate = null) where T : class, new()
+        public static Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<T> AddIfNotExists<T>(
+            this DbSet<T> dbSet, 
+            T entity, 
+            Expression<Func<T, bool>> predicate = null) where T : class, new()
         {
-            var exists = predicate != null ? dbSet.Any(predicate) : dbSet.Any();
+            var exists = predicate != null 
+                ? dbSet.Local.Any(predicate.Compile()) || dbSet.Any(predicate)
+                : dbSet.Local.Any() || dbSet.Any();
+        
             return !exists ? dbSet.Add(entity) : null;
         }
     }

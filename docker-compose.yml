@@ -1,6 +1,10 @@
+# Development Docker Compose
+# Use this for local development only
+# For production, use docker-compose.prod.yml
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:16-alpine
+    container_name: spotify-postgres-dev
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
@@ -8,7 +12,12 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d spotify"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
-  postgres_data:
+  postgres_dev_data:

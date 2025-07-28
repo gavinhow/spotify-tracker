@@ -36,7 +36,8 @@ export const { getClient } = registerApolloClient(async () => {
     cache: new InMemoryCache(),
     link: ApolloLink.from([errorLink,
       new HttpLink({
-        uri: process.env.NEXT_PUBLIC_API_URL + '/graphql',
+        // Use internal API URL for server-side requests within Docker network
+        uri: (process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL) + '/graphql',
         headers: authHeader,
       })
     ]),

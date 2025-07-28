@@ -33,7 +33,8 @@ function makeClient(token: string | undefined, isDemo: boolean) {
     'Authorization': `Bearer ${token}`,
   }
   const httpLink = new HttpLink({
-    // this needs to be an absolute url, as relative urls cannot be used in SSR
+    // Use public API URL for client-side requests (from user's browser)
+    // This needs to be an absolute url, as relative urls cannot be used in SSR
     uri: process.env.NEXT_PUBLIC_API_URL + '/graphql',
     headers: authHeader,
     // you can disable result caching here if you want to

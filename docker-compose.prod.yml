@@ -1,0 +1,115 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: spotify-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: spotify
+      POSTGRES_USER: ${POSTGRES_USER:-spotifyuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-spotifyuser} -d spotify"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - spotify-network
+
+  web-api:
+    build:
+      context: ./Services
+      dockerfile: Dockerfile.web
+    container_name: spotify-web-api
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Sql: Host=postgres;Port=5432;Database=spotify;Username=${POSTGRES_USER:-spotifyuser};Password=${POSTGRES_PASSWORD}
+      Spotify__ClientId: ${SPOTIFY_CLIENT_ID}
+      Spotify__ClientSecret: ${SPOTIFY_CLIENT_SECRET}
+      Spotify__CallbackUri: ${SPOTIFY_CALLBACK_URI}
+      Spotify__ServerUri: ${SPOTIFY_SERVER_URI}
+      AppSettings__Secret: ${JWT_SECRET}
+      DEMO_API_KEY: ${DEMO_API_KEY:-DEMO}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - spotify-network
+
+  importer:
+    build:
+      context: ./Services
+      dockerfile: Dockerfile.importer
+    container_name: spotify-importer
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Sql: Host=postgres;Port=5432;Database=spotify;Username=${POSTGRES_USER:-spotifyuser};Password=${POSTGRES_PASSWORD}
+      Spotify__ClientId: ${SPOTIFY_CLIENT_ID}
+      Spotify__ClientSecret: ${SPOTIFY_CLIENT_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      web-api:
+        condition: service_healthy
+    networks:
+      - spotify-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost}
+    container_name: spotify-frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      # Internal API URL for server-side requests within Docker network
+      INTERNAL_API_URL: http://web-api:8080
+      # Client-side API URL (public facing)
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost}
+    ports:
+      - "3000:3000"
+    depends_on:
+      web-api:
+        condition: service_healthy
+    networks:
+      - spotify-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: spotify-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - web-api
+    networks:
+      - spotify-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  spotify-network:
+    driver: bridge

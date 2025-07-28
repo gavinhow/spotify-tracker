@@ -6,7 +6,7 @@ publish/
 .idea/
 
 docker-compose.override.yml
-
+.env
 # Autosave files
 *~
 

@@ -4,6 +4,7 @@ import * as React from 'react'
 import {
   AudioLines, DiscAlbum, History, LayoutDashboard, PersonStanding,
 } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 
 import { NavMain } from '@/components/nav-main'
 import { NavUser } from '@/components/nav-user'
@@ -60,6 +61,13 @@ const query = gql(/* GraphQL */`
 
 export function AppSidebar({ user, ...props }: { user?: User } & React.ComponentProps<typeof Sidebar>) {
   const { data: me } = useSuspenseQuery(query)
+  const pathname = usePathname()
+
+  // Update navigation items with active state based on current path
+  const navItems = data.navMain.map(item => ({
+    ...item,
+    isActive: pathname === item.url || (item.url !== '/' && pathname.startsWith(item.url))
+  }))
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -73,7 +81,7 @@ export function AppSidebar({ user, ...props }: { user?: User } & React.Component
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain}/>
+        <NavMain items={navItems}/>
       </SidebarContent>
       <SidebarFooter>
         {me.me && <NavUser user={{

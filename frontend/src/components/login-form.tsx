@@ -28,7 +28,7 @@ export function LoginForm({
               <form
                 action={async () => {
                   'use server'
-                  redirect(process.env.NEXT_PUBLIC_API_URL + '/user/login')
+                  redirect(process.env.NEXT_PUBLIC_API_URL + '/user/login', )
                 }}
               >
                 <Button variant="outline" className="w-full">

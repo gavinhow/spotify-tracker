@@ -27,7 +27,7 @@ export function NavMain({
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
-            <SidebarMenuButton size="lg" asChild tooltip={item.title}>
+            <SidebarMenuButton size="lg" asChild tooltip={item.title} isActive={item.isActive}>
               <LinkWithGlobalFilters href={item.url}>
                 {item.icon && <item.icon/>}
                 <span>{item.title}</span>

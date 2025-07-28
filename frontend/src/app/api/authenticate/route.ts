@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     return redirect("/");
   }
 
-  const response = await fetch(process.env.NEXT_PUBLIC_API_URL + `/user/authenticate?code=${code}`);
+  const response = await fetch((process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL) + `/user/authenticate?code=${code}`);
 
   if (!response.ok) {
     return redirect("/");
