@@ -9,8 +9,11 @@ public class SpotifyImporter(SpotifyStatisticsContext dbContext, SpotifyApiFacad
 {
   public async Task ImportUserHistory()
   {
-    var userIds = dbContext.Users.ToArray();
-    await Task.WhenAll(userIds.Select(ImportUserHistory));
+    User[] users = dbContext.Users.ToArray();
+    foreach (User user in users)
+    {
+      await ImportUserHistory(user);
+    }
   }
 
   public async Task ImportTrackInformation()

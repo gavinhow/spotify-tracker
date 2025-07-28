@@ -59,7 +59,7 @@ DEMO_API_KEY=your-demo-api-key
 
 # Frontend
 # Public API URL for client-side requests (from user's browser)
-NEXT_PUBLIC_API_URL=https://yourdomain.com/graphql
+NEXT_PUBLIC_API_URL=https://yourdomain.com
 
 # Note: Internal API URL for server-side requests is automatically configured
 # in Docker Compose to use the internal network: http://web-api:8080

@@ -17,7 +17,7 @@ public class Worker(ILogger<Worker> logger, IServiceProvider services) : Backgro
       // Then import the track information which could be missing
       await importer.ImportTrackInformation();
 
-      await Task.Delay(TimeSpan.FromMinutes(25), stoppingToken); // run every 15 min
+      await Task.Delay(TimeSpan.FromMinutes(25), stoppingToken); // run every 25 min
     }
   }
 }
