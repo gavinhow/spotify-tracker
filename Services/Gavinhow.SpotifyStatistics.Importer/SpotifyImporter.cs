@@ -52,19 +52,40 @@ public class SpotifyImporter(SpotifyStatisticsContext dbContext, SpotifyApiFacad
     logger.LogTrace("Refreshing users token. ({UserId})", userId);
     Token newToken = await spotifyApiFacade.RefreshToken(user.RefreshToken);
     logger.LogTrace("Getting latest track information. ({UserId})", userId);
-    foreach (PlayHistory item in await spotifyApiFacade.GetRecentlyPlayed(user.Id, newToken))
+    
+    var recentlyPlayed = await spotifyApiFacade.GetRecentlyPlayed(user.Id, newToken);
+    if (!recentlyPlayed.Any()) return;
+    
+    // Get the date range of the new plays to minimize the duplicate check query
+    var minPlayTime = recentlyPlayed.Min(p => p.PlayedAt);
+    var maxPlayTime = recentlyPlayed.Max(p => p.PlayedAt);
+    
+    // Only get existing plays within the timeframe we're importing
+    var existingPlaysInRange = dbContext.Plays
+      .Where(p => p.UserId == userId && p.TimeOfPlay >= minPlayTime && p.TimeOfPlay <= maxPlayTime)
+      .Select(p => new { p.TrackId, p.TimeOfPlay })
+      .ToHashSet();
+    
+    var newPlays = new List<Play>();
+    
+    foreach (PlayHistory item in recentlyPlayed)
     {
-      Play play = new Play
+      var playKey = new { TrackId = item.Track.Id, TimeOfPlay = item.PlayedAt };
+      
+      if (!existingPlaysInRange.Contains(playKey))
       {
-        TrackId = item.Track.Id,
-        UserId = userId,
-        TimeOfPlay = item.PlayedAt
-      };
+        newPlays.Add(new Play
+        {
+          TrackId = item.Track.Id,
+          UserId = userId,
+          TimeOfPlay = item.PlayedAt
+        });
+      }
+    }
 
-      dbContext.Plays.AddIfNotExists(play,
-        x => x.TrackId == item.Track.Id
-             && x.UserId == userId
-             && x.TimeOfPlay == item.PlayedAt);
+    if (newPlays.Count > 0)
+    {
+      dbContext.Plays.AddRange(newPlays);
     }
 
     int recordsUpdated = await dbContext.SaveChangesAsync();
