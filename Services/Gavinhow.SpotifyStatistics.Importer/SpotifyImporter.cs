@@ -12,7 +12,14 @@ public class SpotifyImporter(SpotifyStatisticsContext dbContext, SpotifyApiFacad
     User[] users = dbContext.Users.ToArray();
     foreach (User user in users)
     {
-      await ImportUserHistory(user);
+      try
+      {
+        await ImportUserHistory(user);
+      }
+      catch (Exception ex)
+      {
+        logger.LogError(ex, "Failed to import history for user {UserId}", user.Id);
+      }
     }
   }
 

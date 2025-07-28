@@ -12,10 +12,24 @@ public class Worker(ILogger<Worker> logger, IServiceProvider services) : Backgro
 
       
       // First import all the user history
-      await importer.ImportUserHistory();
+      try
+      {
+        await importer.ImportUserHistory();
+      }
+      catch (Exception ex)
+      {
+        logger.LogError(ex, "Failed to import user history");
+      }
       
       // Then import the track information which could be missing
-      await importer.ImportTrackInformation();
+      try
+      {
+        await importer.ImportTrackInformation();
+      }
+      catch (Exception ex)
+      {
+        logger.LogError(ex, "Failed to import track information");
+      }
 
       await Task.Delay(TimeSpan.FromMinutes(25), stoppingToken); // run every 25 min
     }
