@@ -11,6 +11,7 @@ using Gavinhow.SpotifyStatistics.Web.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Prometheus;
 using IAuthorizationHandler = Microsoft.AspNetCore.Authorization.IAuthorizationHandler;
 
 string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -21,6 +22,8 @@ builder.Logging.AddJsonConsole(options =>
 {
   options.IncludeScopes = false;
 });
+
+builder.Services.UseHttpClientMetrics();
 
 builder.Services.AddCors(options =>
 {
@@ -91,7 +94,8 @@ builder.Services.AddDistributedMemoryCache();
 
 // Add health checks
 builder.Services.AddHealthChecks()
-    .AddDbContextCheck<SpotifyStatisticsContext>("database");
+    .AddDbContextCheck<SpotifyStatisticsContext>("database")
+    .ForwardToPrometheus();
 
 var app = builder.Build();
 
@@ -112,7 +116,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapGraphQLHttp().RequireAuthorization("ApiKeyOrBearer");
 app.MapControllers();
-
+app.MapMetrics();
 // Map health check endpoint
 app.MapHealthChecks("/health");
 
