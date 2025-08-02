@@ -1,15 +1,5 @@
 name: CI/CD Function App
 on:
-  push:
-    paths:
-      - 'Services/Gavinhow.SpotifyStatistics.ImportFunction/**'
-      - 'infrastructure/**/import/**'
-      - '.github/workflows/function_app.yml'
-      - '.github/workflows/function_app-deploy.yml'
-      - '.github/workflows/terraform-deploy.yml'
-    branches:
-      - main
-
   workflow_dispatch:
 
 jobs:

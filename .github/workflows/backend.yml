@@ -1,18 +1,5 @@
 name: CI/CD Backend
 on:
-  push:
-    paths:
-      - 'Services/Gavinhow.SpotifyStatistics.Web/**'
-      - 'Services/Gavinhow.SpotifyStatistics.Api/**'
-      - 'Services/Gavinhow.SpotifyStatistics.Database/**'
-      - 'Services/Gavinhow.SpotifyStatistics.Database.Entity/**'
-      - 'infrastructure/**/backend/**'
-      - 'infrastructure/**/backend_azure/**'
-      - '.github/workflows/backend.yml'
-    branches:
-      - main
-      - feature/backend-dev
-
   workflow_dispatch:
 
 
