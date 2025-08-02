@@ -17,6 +17,11 @@ string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.AddJsonConsole(options =>
+{
+  options.IncludeScopes = false;
+});
+
 builder.Services.AddCors(options =>
 {
   options.AddPolicy(MyAllowSpecificOrigins,

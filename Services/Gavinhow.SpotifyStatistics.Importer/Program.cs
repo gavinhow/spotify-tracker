@@ -5,6 +5,10 @@ using Gavinhow.SpotifyStatistics.Importer;
 using Microsoft.EntityFrameworkCore;
 
 var builder = Host.CreateApplicationBuilder(args);
+builder.Logging.AddJsonConsole(options =>
+{
+  options.IncludeScopes = false;
+});
 builder.Services.AddHostedService<Worker>();
 string dbConnString = builder.Configuration.GetConnectionString("Sql");
 builder.Services.AddDbContext<SpotifyStatisticsContext>(options => { options.UseNpgsql(dbConnString); });
