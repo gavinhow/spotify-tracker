@@ -3,6 +3,7 @@ using System;
 using Gavinhow.SpotifyStatistics.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Gavinhow.SpotifyStatistics.Database.Migrations
 {
     [DbContext(typeof(SpotifyStatisticsContext))]
-    partial class SpotifyStatisticsContextModelSnapshot : ModelSnapshot
+    [Migration("20250803093109_AddImportTrackingAndUserDisable")]
+    partial class AddImportTrackingAndUserDisable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

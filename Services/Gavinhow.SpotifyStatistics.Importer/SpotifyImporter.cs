@@ -1,15 +1,17 @@
 using Gavinhow.SpotifyStatistics.Api;
+using Gavinhow.SpotifyStatistics.Api.Settings;
 using Gavinhow.SpotifyStatistics.Database;
 using Gavinhow.SpotifyStatistics.Database.Entity;
+using Microsoft.Extensions.Options;
 using SpotifyAPI.Web.Models;
 
 namespace Gavinhow.SpotifyStatistics.Importer;
 
-public class SpotifyImporter(SpotifyStatisticsContext dbContext, SpotifyApiFacade spotifyApiFacade, ILogger<SpotifyImporter> logger)
+public class SpotifyImporter(SpotifyStatisticsContext dbContext, SpotifyApiFacade spotifyApiFacade, ILogger<SpotifyImporter> logger, IOptions<ImportSettings> importSettings)
 {
   public async Task ImportUserHistory()
   {
-    User[] users = dbContext.Users.ToArray();
+    User[] users = dbContext.Users.Where(u => !u.IsDisabled).ToArray();
     foreach (User user in users)
     {
       try
@@ -19,6 +21,8 @@ public class SpotifyImporter(SpotifyStatisticsContext dbContext, SpotifyApiFacad
       catch (Exception ex)
       {
         logger.LogError(ex, "Failed to import history for user {UserId}", user.Id);
+        await LogImportAttempt(user.Id, 0, false, ex.Message);
+        await CheckAndDisableUserIfNeeded(user.Id);
       }
     }
   }
@@ -54,7 +58,11 @@ public class SpotifyImporter(SpotifyStatisticsContext dbContext, SpotifyApiFacad
     logger.LogTrace("Getting latest track information. ({UserId})", userId);
     
     var recentlyPlayed = await spotifyApiFacade.GetRecentlyPlayed(user.Id, newToken);
-    if (!recentlyPlayed.Any()) return;
+    if (!recentlyPlayed.Any()) 
+    {
+      await LogImportAttempt(userId, 0, true, null);
+      return;
+    }
     
     // Get the date range of the new plays to minimize the duplicate check query
     var minPlayTime = recentlyPlayed.Min(p => p.PlayedAt);
@@ -90,6 +98,8 @@ public class SpotifyImporter(SpotifyStatisticsContext dbContext, SpotifyApiFacad
 
     int recordsUpdated = await dbContext.SaveChangesAsync();
     logger.LogInformation("{RecordsUpdated} records updated. ({UserId})", recordsUpdated, userId);
+    
+    await LogImportAttempt(userId, newPlays.Count, true, null);
   }
   
   private void SaveTrackInformation(FullTrack item)
@@ -126,4 +136,42 @@ public class SpotifyImporter(SpotifyStatisticsContext dbContext, SpotifyApiFacad
              && x.ArtistId == artistAlbum.ArtistId);
     }
   }
+
+  private async Task LogImportAttempt(string userId, int tracksImported, bool isSuccessful, string errorMessage)
+  {
+    var importLog = new ImportLog
+    {
+      UserId = userId,
+      ImportDateTime = DateTime.UtcNow,
+      TracksImported = tracksImported,
+      IsSuccessful = isSuccessful,
+      ErrorMessage = errorMessage
+    };
+
+    dbContext.ImportLogs.Add(importLog);
+    await dbContext.SaveChangesAsync();
+  }
+
+  private async Task CheckAndDisableUserIfNeeded(string userId)
+  {
+    var maxFailures = importSettings.Value.MaxConsecutiveFailures;
+    
+    var recentImports = dbContext.ImportLogs
+      .Where(il => il.UserId == userId)
+      .OrderByDescending(il => il.ImportDateTime)
+      .Take(maxFailures)
+      .ToList();
+
+    if (recentImports.Count == maxFailures && recentImports.All(i => !i.IsSuccessful))
+    {
+      var user = await dbContext.Users.FindAsync(userId);
+      if (user != null)
+      {
+        user.IsDisabled = true;
+        await dbContext.SaveChangesAsync();
+        logger.LogWarning("User {UserId} has been disabled due to {MaxFailures} consecutive import failures", userId, maxFailures);
+      }
+    }
+  }
+
 }

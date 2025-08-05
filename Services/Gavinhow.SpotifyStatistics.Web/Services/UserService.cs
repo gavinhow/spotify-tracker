@@ -1,10 +1,7 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Gavinhow.SpotifyStatistics.Api.Services;
 using Gavinhow.SpotifyStatistics.Api.Settings;
 using Gavinhow.SpotifyStatistics.Database;
 using Gavinhow.SpotifyStatistics.Database.Entity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SpotifyAPI.Web;
 using SpotifyAPI.Web.Auth;
@@ -28,11 +25,13 @@ namespace Gavinhow.SpotifyStatistics.Web.Services
     {
         private readonly SpotifyStatisticsContext _dbContext;
         private readonly SpotifySettings _spotifySettings;
+        private readonly IImportStatusService _importStatusService;
 
-        public UserService(IOptions<SpotifySettings> spotifySettings, SpotifyStatisticsContext dbContext)
+        public UserService(IOptions<SpotifySettings> spotifySettings, SpotifyStatisticsContext dbContext, IImportStatusService importStatusService)
         {
             _dbContext = dbContext;
             _spotifySettings = spotifySettings.Value;
+            _importStatusService = importStatusService;
         }
         public async Task<User> Authenticate(string code)
         {
@@ -76,6 +75,8 @@ namespace Gavinhow.SpotifyStatistics.Web.Services
                 _dbContext.Users.Add(user);
             }
             await _dbContext.SaveChangesAsync();
+            
+            await _importStatusService.EnableUserAsync(user.Id);
 
             return user;
         }

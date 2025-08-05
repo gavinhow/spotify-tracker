@@ -1,4 +1,5 @@
 using Gavinhow.SpotifyStatistics.Api;
+using Gavinhow.SpotifyStatistics.Api.Services;
 using Gavinhow.SpotifyStatistics.Api.Settings;
 using Gavinhow.SpotifyStatistics.Database;
 using Gavinhow.SpotifyStatistics.Importer;
@@ -15,7 +16,9 @@ builder.Services.AddDbContext<SpotifyStatisticsContext>(options => { options.Use
 
 builder.Services.AddMemoryCache(options => options.SizeLimit = 1024);
 builder.Services.Configure<SpotifySettings>(builder.Configuration.GetSection("Spotify"));
+builder.Services.Configure<ImportSettings>(builder.Configuration.GetSection("Import"));
 builder.Services.AddTransient<SpotifyApiFacade>();
+builder.Services.AddScoped<IImportStatusService, ImportStatusService>();
 builder.Services.AddScoped<SpotifyImporter>();
 
 var host = builder.Build();

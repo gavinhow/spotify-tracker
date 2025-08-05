@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -18,6 +18,7 @@ namespace Gavinhow.SpotifyStatistics.Database
         public DbSet<Track> Tracks { get; set; }
         public DbSet<ArtistAlbum> ArtistAlbums { get; set; }
         public DbSet<ArtistTrack> ArtistTracks { get; set; }
+        public DbSet<ImportLog> ImportLogs { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,6 +38,12 @@ namespace Gavinhow.SpotifyStatistics.Database
                 .HasForeignKey(p => p.TrackId)
                 .OnDelete(DeleteBehavior.NoAction)
                 .IsRequired(false);
+
+            modelBuilder.Entity<ImportLog>()
+                .HasOne(il => il.User)
+                .WithMany(u => u.ImportLogs)
+                .HasForeignKey(il => il.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);
         }

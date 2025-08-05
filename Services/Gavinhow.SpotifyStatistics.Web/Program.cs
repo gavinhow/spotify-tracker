@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text;
 using Gavinhow.SpotifyStatistics.Api;
+using Gavinhow.SpotifyStatistics.Api.Services;
 using Gavinhow.SpotifyStatistics.Api.Settings;
 using Gavinhow.SpotifyStatistics.Database;
 using Gavinhow.SpotifyStatistics.Web.Authorization.Handler;
@@ -77,9 +78,11 @@ builder.Services.AddMemoryCache(options => options.SizeLimit = 1024);
 builder.Services.Configure<ApiKeyAuthenticationOptions>(builder.Configuration.GetSection("ApiSettings"));
 builder.Services.Configure<SpotifySettings>(builder.Configuration.GetSection("Spotify"));
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+builder.Services.Configure<ImportSettings>(builder.Configuration.GetSection("Import"));
 builder.Services.Configure<AppSettings>(appSettingsSection);
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<SpotifyApiFacade>();
+builder.Services.AddScoped<IImportStatusService, ImportStatusService>();
 builder.Services.AddScoped<IAuthorizationHandler, AllowedUserIdHandler>();
 
 builder
