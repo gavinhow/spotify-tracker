@@ -15,8 +15,6 @@ using Microsoft.IdentityModel.Tokens;
 using Prometheus;
 using IAuthorizationHandler = Microsoft.AspNetCore.Authorization.IAuthorizationHandler;
 
-string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.AddJsonConsole(options =>
@@ -26,16 +24,32 @@ builder.Logging.AddJsonConsole(options =>
 
 builder.Services.UseHttpClientMetrics();
 
+var corsSettings = builder.Configuration.GetSection("Cors").Get<CorsSettings>();
+if (corsSettings == null || corsSettings.AllowedOrigins.Length == 0)
+{
+  throw new InvalidOperationException("CORS configuration is missing or has no allowed origins");
+}
+
 builder.Services.AddCors(options =>
 {
-  options.AddPolicy(MyAllowSpecificOrigins,
-    builder =>
+  options.AddPolicy("default", policy =>
+  {
+    policy.WithOrigins(corsSettings.AllowedOrigins);
+    policy.WithMethods(corsSettings.AllowedMethods);
+    policy.WithHeaders(corsSettings.AllowedHeaders);
+
+    if (corsSettings.ExposedHeaders.Length > 0)
     {
-      builder.AllowAnyOrigin();
-      // builder.AllowCredentials();
-      builder.AllowAnyHeader();
-      builder.AllowAnyMethod();
-    });
+      policy.WithExposedHeaders(corsSettings.ExposedHeaders);
+    }
+
+    policy.SetPreflightMaxAge(TimeSpan.FromSeconds(corsSettings.MaxAgeSeconds));
+
+    if (corsSettings.AllowCredentials)
+    {
+      policy.AllowCredentials();
+    }
+  });
 });
 string dbConnString = builder.Configuration.GetConnectionString("Sql");
 builder.Services.AddDbContext<SpotifyStatisticsContext>(options => { options.UseNpgsql(dbConnString); });
@@ -109,7 +123,7 @@ if (app.Environment.IsDevelopment())
 }
 
 
-app.UseCors(MyAllowSpecificOrigins);
+app.UseCors("default");
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
