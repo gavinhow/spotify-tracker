@@ -17,10 +17,11 @@ using IAuthorizationHandler = Microsoft.AspNetCore.Authorization.IAuthorizationH
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Logging.AddJsonConsole(options =>
-{
-  options.IncludeScopes = false;
-});
+if (builder.Environment.IsProduction())
+  builder.Logging.AddJsonConsole(options =>
+  {
+    options.IncludeScopes = false;
+  });
 
 builder.Services.UseHttpClientMetrics();
 
@@ -63,14 +64,17 @@ var key = Encoding.ASCII.GetBytes(appSettings.Secret);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
   .AddJwtBearer(x =>
   {
-    x.RequireHttpsMetadata = false;
+    x.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
     x.SaveToken = true;
     x.TokenValidationParameters = new TokenValidationParameters
     {
       ValidateIssuerSigningKey = true,
       IssuerSigningKey = new SymmetricSecurityKey(key),
-      ValidateIssuer = false,
-      ValidateAudience = false
+      ValidateIssuer = true,
+      ValidIssuer = appSettings.Issuer,
+      ValidateAudience = true,
+      ValidAudience = appSettings.Audience,
+      ClockSkew = TimeSpan.FromMinutes(5)
     };
   });
 

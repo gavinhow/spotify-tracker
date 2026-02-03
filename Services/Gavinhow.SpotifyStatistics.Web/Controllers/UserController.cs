@@ -68,6 +68,8 @@ namespace Gavinhow.SpotifyStatistics.Web.Controllers
                     new Claim(ClaimTypes.Name, user.Id)
           }),
         Expires = DateTime.UtcNow.AddDays(7),
+        Issuer = _appSettings.Issuer,
+        Audience = _appSettings.Audience,
         SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
               SecurityAlgorithms.HmacSha256Signature)
       };
