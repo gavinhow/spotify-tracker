@@ -10,6 +10,7 @@
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Azure.Data.Tables" Version="12.4.0" />
     <PackageReference Include="SpotifyAPI.Web" Version="4.2.2" />
     <PackageReference Include="SpotifyAPI.Web.Auth" Version="4.2.2" />
     <PackageReference Include="EmbedIO" Version="3.3.3" />

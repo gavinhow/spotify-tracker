@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Azure.Storage.Queues" Version="12.18.0" />
         <PackageReference Include="HotChocolate.AspNetCore" Version="14.3.0"/>
         <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="14.3.0" />
         <PackageReference Include="HotChocolate.AspNetCore.CommandLine" Version="14.3.0"/>

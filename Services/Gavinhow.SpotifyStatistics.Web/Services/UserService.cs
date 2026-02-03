@@ -26,12 +26,14 @@ namespace Gavinhow.SpotifyStatistics.Web.Services
         private readonly SpotifyStatisticsContext _dbContext;
         private readonly SpotifySettings _spotifySettings;
         private readonly IImportStatusService _importStatusService;
+        private readonly IUserTokenStore _userTokenStore;
 
-        public UserService(IOptions<SpotifySettings> spotifySettings, SpotifyStatisticsContext dbContext, IImportStatusService importStatusService)
+        public UserService(IOptions<SpotifySettings> spotifySettings, SpotifyStatisticsContext dbContext, IImportStatusService importStatusService, IUserTokenStore userTokenStore)
         {
             _dbContext = dbContext;
             _spotifySettings = spotifySettings.Value;
             _importStatusService = importStatusService;
+            _userTokenStore = userTokenStore;
         }
         public async Task<User> Authenticate(string code)
         {
@@ -75,8 +77,16 @@ namespace Gavinhow.SpotifyStatistics.Web.Services
                 _dbContext.Users.Add(user);
             }
             await _dbContext.SaveChangesAsync();
-            
+
             await _importStatusService.EnableUserAsync(user.Id);
+
+            // Push fresh tokens to Azure Table Storage immediately so the
+            // Function App can import plays on its next cycle without waiting
+            // for the periodic sync.
+            var tokenExpiry = new DateTimeOffset(token.CreateDate, TimeSpan.Zero)
+                .AddSeconds(token.ExpiresIn);
+            await _userTokenStore.UpsertUserTokenAsync(
+                user.Id, token.AccessToken, token.RefreshToken, tokenExpiry, isDisabled: false);
 
             return user;
         }

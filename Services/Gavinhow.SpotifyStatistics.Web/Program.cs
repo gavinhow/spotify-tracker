@@ -1,11 +1,14 @@
 using System.Reflection;
 using System.Text;
+using Azure.Data.Tables;
+using Azure.Storage.Queues;
 using Gavinhow.SpotifyStatistics.Api;
 using Gavinhow.SpotifyStatistics.Api.Services;
 using Gavinhow.SpotifyStatistics.Api.Settings;
 using Gavinhow.SpotifyStatistics.Database;
 using Gavinhow.SpotifyStatistics.Web.Authorization.Handler;
 using Gavinhow.SpotifyStatistics.Web.Authorization.Requirements;
+using Gavinhow.SpotifyStatistics.Web.BackgroundServices;
 using Gavinhow.SpotifyStatistics.Web.Extensions;
 using Gavinhow.SpotifyStatistics.Web.Services;
 using Gavinhow.SpotifyStatistics.Web.Settings;
@@ -102,6 +105,32 @@ builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<SpotifyApiFacade>();
 builder.Services.AddScoped<IImportStatusService, ImportStatusService>();
 builder.Services.AddScoped<IAuthorizationHandler, AllowedUserIdHandler>();
+
+// Queue consumer configuration
+builder.Services.Configure<QueueSettings>(builder.Configuration.GetSection("Queue"));
+var queueSettings = builder.Configuration.GetSection("Queue").Get<QueueSettings>();
+
+if (queueSettings?.Enabled == true && !string.IsNullOrEmpty(queueSettings.ConnectionString))
+{
+    builder.Services.AddSingleton(new QueueClient(queueSettings.ConnectionString, queueSettings.QueueName));
+    builder.Services.AddScoped<IPlaysQueueProcessor, PlaysQueueProcessor>();
+    builder.Services.AddHostedService<QueueConsumerBackgroundService>();
+}
+
+// Table Storage — user-token resilient store + periodic Postgres → Azure sync
+builder.Services.Configure<TableStorageSettings>(builder.Configuration.GetSection("TableStorage"));
+var tableStorageSettings = builder.Configuration.GetSection("TableStorage").Get<TableStorageSettings>();
+
+if (tableStorageSettings?.Enabled == true && !string.IsNullOrEmpty(tableStorageSettings.ConnectionString))
+{
+    builder.Services.AddSingleton(new TableClient(tableStorageSettings.ConnectionString, tableStorageSettings.TableName));
+    builder.Services.AddScoped<IUserTokenStore, UserTokenStore>();
+    builder.Services.AddHostedService<UserTokenSyncBackgroundService>();
+}
+else
+{
+    builder.Services.AddScoped<IUserTokenStore, NoOpUserTokenStore>();
+}
 
 builder
   .AddGraphQL()
