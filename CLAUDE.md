@@ -2,97 +2,148 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Architecture
+## Project Overview
 
-This is a full-stack Spotify listening statistics application with the following architecture:
+Full-stack Spotify listening statistics application built with ASP.NET Core 8.0 backend (GraphQL via HotChocolate) and Next.js 15 frontend. The system tracks Spotify listening history and provides analytics and insights.
 
-### Backend (.NET)
-- **Web API**: ASP.NET Core 8.0 GraphQL API using HotChocolate (`Services/Gavinhow.SpotifyStatistics.Web/`)
-- **Database Layer**: Entity Framework Core with PostgreSQL (`Services/Gavinhow.SpotifyStatistics.Database/`)
-- **Entities**: Data models and domain objects (`Services/Gavinhow.SpotifyStatistics.Database.Entity/`)
-- **API Facade**: Spotify API integration layer (`Services/Gavinhow.SpotifyStatistics.Api/`)
-- **Import Function**: Azure Functions for data import (`Services/Gavinhow.SpotifyStatistics.ImportFunction/`)
-- **Importer Service**: Background worker service for continuous data import (`Services/Gavinhow.SpotifyStatistics.Importer/`)
+## Architecture
 
-### Frontend (Next.js)
-- **Framework**: Next.js 15 with App Router (`frontend/`)
-- **UI**: React components using Tailwind CSS and Radix UI
-- **GraphQL**: Apollo Client with code generation from backend schema
-- **Authentication**: JWT-based auth with Spotify OAuth integration
+### Backend (.NET) - `Services/`
+
+**Core Services:**
+- **Web API** (`Gavinhow.SpotifyStatistics.Web/`) - GraphQL API entry point with authorization, authentication, health checks, and Prometheus metrics
+- **Database** (`Gavinhow.SpotifyStatistics.Database/`) - EF Core DbContext and migrations for PostgreSQL
+- **Database.Entity** (`Gavinhow.SpotifyStatistics.Database.Entity/`) - Domain entities and data models
+- **Api** (`Gavinhow.SpotifyStatistics.Api/`) - Spotify API client integration and service abstraction
+- **Importer** (`Gavinhow.SpotifyStatistics.Importer/`) - Background worker service for continuous data sync
+- **ImportFunction** (`Gavinhow.SpotifyStatistics.ImportFunction/`) - Azure Functions for cloud-based data import
+
+**Key Patterns:**
+- GraphQL queries organized in `Services/Gavinhow.SpotifyStatistics.Web/Queries/` (GetTopSongsQuery, GetTopArtistsQuery, GetTopAlbumsQuery, GetPlaysQuery, etc.)
+- GraphQL types in `Types/` folder with root Query type coordinating all queries
+- Authorization via `Authorization/Handler` and `Authorization/Requirements` for JWT validation
+- CQRS pattern with IQuery interface in `CQRS/` for query abstraction
+- Entity Framework Core 6.0.4 (note: version mismatch with target framework net8.0, check for potential updates)
+- HotChocolate 14.3.0 with Data and Authorization packages
+
+### Frontend (Next.js) - `frontend/`
+
+**Structure:**
+- `app/` - Next.js App Router pages and layouts
+- `components/` - React components (UI library using Radix UI + Tailwind CSS + shadcn/ui)
+- `lib/` - Utilities including `client.ts` (Apollo Client setup)
+- `__generated__/` - GraphQL code generation output (auto-generated from schema)
+- `middleware.ts` - Authentication middleware
+
+**Key Setup:**
+- Apollo Client 3.12.4 with experimental Next.js App Router support
+- GraphQL code generation via `@graphql-codegen/client-preset`
+- TypeScript with strict type checking
+- No test framework configured (Jest/Vitest not in dependencies)
 
 ### Database
-- PostgreSQL database with Entity Framework migrations
-- Docker Compose setup for local development
-- Seed data available in `Services/Gavinhow.SpotifyStatistics.Database/SeedData/`
+
+- PostgreSQL with EF Core migrations
+- Docker Compose for local development (`docker-compose.yml` and `docker-compose.prod.yml`)
+- Seed data in `Services/Gavinhow.SpotifyStatistics.Database/SeedData/`
 
 ## Development Commands
 
 ### Backend (.NET)
+
+From `Services/` directory or repository root:
+
 ```bash
-# Build all projects
+# Build
 dotnet build Services/SpotifyStatistics.sln
 
-# Run the main web API (from Services/ directory)
-dotnet run --project Gavinhow.SpotifyStatistics.Web
+# Run Web API (listens on port 5000)
+dotnet run --project Services/Gavinhow.SpotifyStatistics.Web
 
-# Run database migrations
+# Run Importer service
+dotnet run --project Services/Gavinhow.SpotifyStatistics.Importer
+
+# Create migration (from Services/ directory)
+dotnet ef migrations add MigrationName --project Gavinhow.SpotifyStatistics.Database --startup-project Gavinhow.SpotifyStatistics.Web
+
+# Apply migrations
 dotnet ef database update --project Gavinhow.SpotifyStatistics.Database --startup-project Gavinhow.SpotifyStatistics.Web
 
-# Run the importer service
-dotnet run --project Gavinhow.SpotifyStatistics.Importer
+# Watch for changes (requires dotnet watch tool)
+dotnet watch run --project Services/Gavinhow.SpotifyStatistics.Web
 ```
 
 ### Frontend (Next.js)
+
+From `frontend/` directory:
+
 ```bash
-# Install dependencies (from frontend/ directory)
+# Install dependencies (uses pnpm)
 pnpm install
 
-# Run development server
+# Development server (listens on port 3000 with Turbopack)
 pnpm dev
 
-# Build for production
+# Production build
 pnpm build
 
-# Run linting
+# Start production server
+pnpm start
+
+# Linting
 pnpm lint
 
-# Generate GraphQL types from backend schema
+# Generate TypeScript types from GraphQL schema
 pnpm compile
 
-# Watch and regenerate GraphQL types
+# Watch and regenerate on schema changes
 pnpm watch
 ```
 
 ### Infrastructure
+
 ```bash
-# Start local PostgreSQL database
+# Start PostgreSQL and other services
 docker-compose up -d
 
-# Stop database
+# Stop services
 docker-compose down
+
+# View logs
+docker-compose logs -f
 ```
 
-## Key Architecture Decisions
+## Important Architecture Details
 
-- **GraphQL API**: Uses HotChocolate for type-safe GraphQL schema with authorization
-- **Authentication**: Dual auth scheme supporting both JWT Bearer tokens and API keys
-- **Database**: PostgreSQL with EF Core migrations, designed to handle large volumes of play history data
-- **Import Strategy**: Separate services for Azure Functions (cloud) and Worker Service (local) data import
-- **Frontend State**: Apollo Client for GraphQL state management with generated TypeScript types
-- **UI Components**: Shadcn/ui component library built on Radix UI primitives
+### GraphQL Schema
+- **Root Query** defined in `Services/Gavinhow.SpotifyStatistics.Web/Types/Query.cs`
+- **Query Handlers** in `Queries/` folder using CQRS pattern with IQuery interface
+- Schema introspection available at `/graphql` when API runs
+- Authorization via HotChocolate Authorize attribute on queries/types
 
-## Project Dependencies
+### Authentication & Authorization
+- JWT Bearer tokens generated and validated in Program.cs
+- Dual auth support: JWT tokens and API keys
+- Custom authorization handlers in `Authorization/Handler/`
+- Frontend middleware in `frontend/src/middleware.ts` handles auth flow
 
-- Backend targets .NET 8.0
-- Frontend uses Node.js with pnpm package manager
-- Database requires PostgreSQL
-- Spotify API integration for OAuth and data fetching
-- Azure services for cloud deployment (Functions, App Service)
+### Data Flow
+1. Frontend authenticates user via Spotify OAuth
+2. Backend validates JWT tokens on each GraphQL request
+3. CQRS queries fetch data from PostgreSQL via EF Core
+4. Results sent to Apollo Client for caching and UI updates
+5. Background importer syncs latest data from Spotify API
 
-## Development Environment Setup
+### Configuration
+- Backend settings in `appsettings.json` and `appsettings.Development.json`
+- Frontend environment via `.env` file (see `.env.example`)
+- Spotify OAuth credentials required in both backend and frontend configs
 
-1. Start PostgreSQL: `docker-compose up -d`
-2. Run backend: `dotnet run --project Services/Gavinhow.SpotifyStatistics.Web`
-3. Install frontend deps: `cd frontend && pnpm install`
-4. Run frontend: `pnpm dev`
-5. Generate GraphQL types: `pnpm compile`
+## Development Tips
+
+- **HotChocolate Analyzer**: The types analyzer package provides compile-time validation of GraphQL schema
+- **PostgreSQL**: Default local connection string in docker-compose uses `user:password` credentials
+- **GraphQL Code Generation**: Always run `pnpm compile` after backend schema changes to update frontend types
+- **Apollo Client**: Configured with `@apollo/experimental-nextjs-app-support` for App Router integration
+- **Turbopack**: Frontend uses Next.js Turbopack for faster dev rebuilds
+- **pnpm**: Monorepo package manager (enforced via preinstall script)

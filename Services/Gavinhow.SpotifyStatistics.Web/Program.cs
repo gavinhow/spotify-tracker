@@ -108,10 +108,6 @@ if (app.Environment.IsDevelopment())
   app.MapNitroApp();
 }
 
-// if (app.Environment.IsProduction())
-// {
-//   app.UseHttpsRedirection();
-// }
 
 app.UseCors(MyAllowSpecificOrigins);
 app.UseRouting();
