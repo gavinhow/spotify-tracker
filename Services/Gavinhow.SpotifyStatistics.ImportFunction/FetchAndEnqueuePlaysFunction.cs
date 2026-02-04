@@ -29,7 +29,7 @@ public class FetchAndEnqueuePlaysFunction
     }
 
     [Function("FetchAndEnqueuePlays")]
-    public async Task RunAsync([TimerTrigger("0 */25 * * * *")] TimerInfo timer)
+    public async Task RunAsync([TimerTrigger("0 */20 * * * *")] TimerInfo timer)
     {
         _logger.LogInformation("Starting play fetch at {Time}", DateTime.UtcNow);
 
