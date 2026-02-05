@@ -69,9 +69,6 @@ importers:
       next:
         specifier: 16.1.6
         version: 16.1.6(@babel/core@7.26.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      next-logger:
-        specifier: ^5.0.2
-        version: 5.0.2(next@16.1.6(@babel/core@7.26.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(pino@9.14.0)
       pino:
         specifier: ^9.4.0
         version: 9.14.0
@@ -3153,18 +3150,6 @@ packages:
   negotiator@1.0.0:
     resolution: {integrity: sha512-8Ofs/AUQh8MaEcrlq5xOX0CQ9ypTF5dl78mjlMNfOK08fzpgTHQRQPBxcPlEtIw0yRpws+Zo/3r+5WRby7u3Gg==}
     engines: {node: '>= 0.6'}
-
-  next-logger@5.0.2:
-    resolution: {integrity: sha512-2/ueKES1Na8zDxkP1lWdHCtEEN+EHyWhwlBtAd5/zklB8uf9Q3kCNg603Hd4ArG8u7ToV9mbgZne9CkOncULbw==}
-    peerDependencies:
-      next: '>=9.0.0'
-      pino: ^8.0.0 || ^9.0.0 || ^10.0.0
-      winston: ^3.0.0
-    peerDependenciesMeta:
-      pino:
-        optional: true
-      winston:
-        optional: true
 
   next@16.1.6:
     resolution: {integrity: sha512-hkyRkcu5x/41KoqnROkfTm2pZVbKxvbZRuNvKXLRXxs3VfyO0WhY50TQS40EuKO9SW3rBj/sF3WbVwDACeMZyw==}
@@ -7718,13 +7703,6 @@ snapshots:
   natural-compare@1.4.0: {}
 
   negotiator@1.0.0: {}
-
-  next-logger@5.0.2(next@16.1.6(@babel/core@7.26.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(pino@9.14.0):
-    dependencies:
-      lilconfig: 3.1.3
-      next: 16.1.6(@babel/core@7.26.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-    optionalDependencies:
-      pino: 9.14.0
 
   next@16.1.6(@babel/core@7.26.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
