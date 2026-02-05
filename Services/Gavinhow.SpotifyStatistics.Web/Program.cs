@@ -10,6 +10,7 @@ using Gavinhow.SpotifyStatistics.Web.Authorization.Handler;
 using Gavinhow.SpotifyStatistics.Web.Authorization.Requirements;
 using Gavinhow.SpotifyStatistics.Web.BackgroundServices;
 using Gavinhow.SpotifyStatistics.Web.Extensions;
+using Gavinhow.SpotifyStatistics.Logging;
 using Gavinhow.SpotifyStatistics.Web.Services;
 using Gavinhow.SpotifyStatistics.Web.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,11 +21,7 @@ using IAuthorizationHandler = Microsoft.AspNetCore.Authorization.IAuthorizationH
 
 var builder = WebApplication.CreateBuilder(args);
 
-if (builder.Environment.IsProduction())
-  builder.Logging.AddJsonConsole(options =>
-  {
-    options.IncludeScopes = false;
-  });
+builder.AddStructuredLogging();
 
 builder.Services.UseHttpClientMetrics();
 
@@ -149,12 +146,13 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
+app.UseStructuredRequestLogging();
+
 if (app.Environment.IsDevelopment())
 {
   app.UseDeveloperExceptionPage();
   app.MapNitroApp();
 }
-
 
 app.UseCors("default");
 app.UseRouting();

@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gavinhow.SpotifyStatistics.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gavinhow.SpotifyStatistics.Importer", "Gavinhow.SpotifyStatistics.Importer\Gavinhow.SpotifyStatistics.Importer.csproj", "{66BDB3C1-3F5A-4234-93AE-46988616E0ED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gavinhow.SpotifyStatistics.Logging", "Gavinhow.SpotifyStatistics.Logging\Gavinhow.SpotifyStatistics.Logging.csproj", "{9BFE22A6-0710-4CA0-A64B-35686E54557C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,5 +45,9 @@ Global
 		{66BDB3C1-3F5A-4234-93AE-46988616E0ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66BDB3C1-3F5A-4234-93AE-46988616E0ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66BDB3C1-3F5A-4234-93AE-46988616E0ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BFE22A6-0710-4CA0-A64B-35686E54557C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BFE22A6-0710-4CA0-A64B-35686E54557C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BFE22A6-0710-4CA0-A64B-35686E54557C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BFE22A6-0710-4CA0-A64B-35686E54557C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

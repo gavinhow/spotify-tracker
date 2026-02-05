@@ -41,6 +41,7 @@
       <ProjectReference Include="..\Gavinhow.SpotifyStatistics.Api\Gavinhow.SpotifyStatistics.Api.csproj" />
       <ProjectReference Include="..\Gavinhow.SpotifyStatistics.Database.Entity\Gavinhow.SpotifyStatistics.Database.Entity.csproj" />
       <ProjectReference Include="..\Gavinhow.SpotifyStatistics.Database\Gavinhow.SpotifyStatistics.Database.csproj" />
+      <ProjectReference Include="..\Gavinhow.SpotifyStatistics.Logging\Gavinhow.SpotifyStatistics.Logging.csproj" />
     </ItemGroup>
 
 </Project>
