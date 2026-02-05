@@ -28,7 +28,7 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_ENVIRONMENT: Production
-      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_URLS: http://+:8080;http://+:9090
       ConnectionStrings__Sql: Host=postgres;Port=5432;Database=spotify;Username=${POSTGRES_USER:-spotifyuser};Password=${POSTGRES_PASSWORD}
       Spotify__ClientId: ${SPOTIFY_CLIENT_ID}
       Spotify__ClientSecret: ${SPOTIFY_CLIENT_SECRET}
@@ -38,6 +38,7 @@ services:
       DEMO_API_KEY: ${DEMO_API_KEY:-DEMO}
     ports:
       - "8080:8080"
+      - "9090:9090"
     depends_on:
       postgres:
         condition: service_healthy

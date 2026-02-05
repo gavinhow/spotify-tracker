@@ -42,12 +42,12 @@ RUN chown -R spotifyapp:spotifyapp /app
 USER spotifyapp
 
 # ASP.NET Core configuration for Coolify
-ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_URLS=http://+:8080;http://+:9090
 ENV ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
 
 # Health check endpoint
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:8080/health || exit 1
 
-EXPOSE 8080
+EXPOSE 8080 9090
 ENTRYPOINT ["dotnet", "Gavinhow.SpotifyStatistics.Web.dll"]
