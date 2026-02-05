@@ -5,7 +5,7 @@
  * without breaking SSR. For server-side logging, use the main logger.
  */
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
+type LogLevel = 'debug' | 'info' | 'warning' | 'error' | 'fatal';
 
 interface LogContext {
   [key: string]: unknown;
@@ -83,7 +83,7 @@ function logToConsole(level: LogLevel, logObject: Record<string, unknown>): void
     case 'info':
       console.info(message, rest);
       break;
-    case 'warn':
+    case 'warning':
       console.warn(message, rest);
       break;
     case 'error':
@@ -115,11 +115,11 @@ export const browserLogger = {
     }
   },
 
-  warn(context: LogContext | string, message?: string): void {
+  warning(context: LogContext | string, message?: string): void {
     if (typeof context === 'string') {
-      logToConsole('warn', formatBrowserLog('warn', {}, context));
+      logToConsole('warning', formatBrowserLog('warning', {}, context));
     } else {
-      logToConsole('warn', formatBrowserLog('warn', context, message || ''));
+      logToConsole('warning', formatBrowserLog('warning', context, message || ''));
     }
   },
 

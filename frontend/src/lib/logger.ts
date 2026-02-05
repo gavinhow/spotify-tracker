@@ -100,7 +100,7 @@ function createLogger(): PinoLogger {
     messageKey: 'message', // Use 'message' instead of 'msg'
     formatters: {
       level: (label: string) => {
-        return { level: label };
+        return { level: label === 'warn' ? 'warning' : label };
       },
       log: formatLogProperties,
       bindings: formatBindings,
