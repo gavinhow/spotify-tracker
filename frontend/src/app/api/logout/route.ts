@@ -1,8 +1,31 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   const cookieStore = await cookies();
-  cookieStore.delete('token'); // Set the cookie with secure options
-  return redirect('/'); // Redirect to homepage
+  const tokenCookie = cookieStore.get('token');
+
+  // Extract user ID from token if available for logging
+  let userId: string | undefined;
+  try {
+    if (tokenCookie?.value) {
+      const user = JSON.parse(tokenCookie.value);
+      userId = user.id;
+    }
+  } catch {
+    // Ignore parsing errors
+  }
+
+  cookieStore.delete('token');
+
+  logger.info(
+    {
+      userId,
+      action: 'logout',
+    },
+    'User logged out'
+  );
+
+  return redirect('/');
 }

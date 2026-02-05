@@ -1,4 +1,4 @@
-import type { NextConfig } from 'next';
+import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -9,11 +9,7 @@ const nextConfig: NextConfig = {
       }
     ]
   },
-  logging: {
-    fetches: {
-      fullUrl: true,
-    },
-  },
+  serverExternalPackages: ["pino", "pino-pretty"]
 };
 
 export default nextConfig;
