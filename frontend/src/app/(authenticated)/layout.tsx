@@ -33,12 +33,17 @@ const AuthenticatedLayout = async ({ children }: { children: React.ReactNode }) 
   const headersList = await headers();
   const isDemo = headersList.get('is_demo') === 'true';
 
-  const { data } = await AuthSafeQuery({
-    query,
-    variables: {
-      userId: user?.id ?? 'gavinhow'
-    }
-  })
+  // Skip query if no valid user token to prevent 401 errors from server-side rendering
+  let data;
+  if (user?.token || isDemo) {
+    const result = await AuthSafeQuery({
+      query,
+      variables: {
+        userId: user?.id ?? 'gavinhow'
+      }
+    });
+    data = result.data;
+  }
 
   if (data?.plays?.edges?.length === 0) {
     return <div className="p-2 h-svh w-svw flex flex-row justify-center items-center">
