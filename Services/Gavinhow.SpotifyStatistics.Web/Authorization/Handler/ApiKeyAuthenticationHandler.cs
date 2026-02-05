@@ -22,7 +22,8 @@ public class ApiKeyAuthenticationHandler(
   {
     if (!Request.Headers.TryGetValue("ApiKey", out var apiKeyValues))
     {
-      return AuthenticateResult.Fail("Missing API Key");
+      // Absence of an API key means this scheme does not apply to the request.
+      return AuthenticateResult.NoResult();
     }
 
     var providedApiKey = apiKeyValues.FirstOrDefault();
