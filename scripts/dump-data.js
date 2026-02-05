@@ -17,7 +17,7 @@ const DB_CONFIG = {
 
 const OUTPUT_DIR = process.env.OUTPUT_DIR || './data-dump';
 const TIMESTAMP = new Date().toISOString().replace(/[:.]/g, '-');
-const OUTPUT_FILE = path.join(OUTPUT_DIR, `spotify-data-${TIMESTAMP}.sql`);
+const OUTPUT_FILE = path.join(OUTPUT_DIR, `spotify-data-${TIMESTAMP}.pgdump`);
 
 function main() {
   console.log('Starting PostgreSQL data dump...');
@@ -31,18 +31,17 @@ function main() {
   // Set PGPASSWORD environment variable
   process.env.PGPASSWORD = DB_CONFIG.password;
 
-  // Build pg_dump command for schema and data dump
+  // Build pg_dump command for custom format (binary, much faster)
   const dumpCommand = [
     'pg_dump',
     `--host=${DB_CONFIG.host}`,
     `--port=${DB_CONFIG.port}`,
     `--username=${DB_CONFIG.username}`,
     `--dbname=${DB_CONFIG.database}`,
-    '--inserts',            // Use INSERT statements for easier anonymization
-    '--disable-triggers',   // Disable triggers during restore
+    '--format=custom',      // Binary format for speed
+    '--compress=6',         // Good compression level
     '--no-owner',          // Don't output ownership commands
     '--no-privileges',     // Don't output privilege commands
-    // '--schema=SpotifyTracker', // Only dump SpotifyTracker schema
     `--file=${OUTPUT_FILE}`
   ].join(' ');
 

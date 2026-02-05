@@ -15,7 +15,7 @@ const LOCAL_DB_CONFIG = {
   password: process.env.TARGET_DB_PASSWORD || 'postgres'
 };
 
-const INPUT_FILE = process.argv[2] || './data-dump/spotify-data-anonymized.sql';
+const INPUT_FILE = process.argv[2] || './data-dump/spotify-data-anonymized.pgdump';
 
 // Progress spinner function
 function startSpinner(message) {
@@ -111,46 +111,26 @@ async function restoreData() {
   const stats = fs.statSync(INPUT_FILE);
   const fileSizeInMB = (stats.size / (1024 * 1024)).toFixed(1);
   
+  // Detect number of CPU cores for parallel processing
+  const os = require('os');
+  const numCores = Math.min(os.cpus().length, 4); // Max 4 parallel jobs
+  
   // Set PGPASSWORD environment variable
   process.env.PGPASSWORD = LOCAL_DB_CONFIG.password;
   
-  const spinner = startSpinner(`🔄 Restoring ${fileSizeInMB}MB of data...`);
+  const spinner = startSpinner(`🚀 Restoring ${fileSizeInMB}MB of data (${numCores} parallel jobs)...`);
   
   return new Promise((resolve, reject) => {
-    // Create a temporary SQL file with performance optimizations
-    const optimizedFile = INPUT_FILE.replace('.sql', '-optimized.sql');
-    const content = fs.readFileSync(INPUT_FILE, 'utf8');
-    
-    // Add performance optimizations at the beginning (only safe runtime settings)
-    const optimizedContent = `
--- Performance optimizations for bulk INSERT (universally safe)
-SET synchronous_commit = off;
-SET work_mem = '50MB';
-SET maintenance_work_mem = '256MB';
-
--- Use explicit transaction for better performance
-BEGIN;
-
-${content}
-
--- Commit the transaction
-COMMIT;
-
--- Reset settings to defaults
-RESET synchronous_commit;
-RESET work_mem;
-RESET maintenance_work_mem;
-`;
-    
-    fs.writeFileSync(optimizedFile, optimizedContent);
-    
-    const psql = spawn('psql', [
+    const pgRestore = spawn('pg_restore', [
       `--host=${LOCAL_DB_CONFIG.host}`,
       `--port=${LOCAL_DB_CONFIG.port}`,
       `--username=${LOCAL_DB_CONFIG.username}`,
       `--dbname=${LOCAL_DB_CONFIG.database}`,
-      '--set=ON_ERROR_STOP=on',  // Stop on first error
-      `--file=${optimizedFile}`
+      `--jobs=${numCores}`,        // Parallel processing
+      '--no-owner',               // Don't restore ownership
+      '--no-privileges',          // Don't restore privileges
+      '--disable-triggers',       // Disable triggers during restore
+      INPUT_FILE
     ], {
       env: { ...process.env, PGPASSWORD: LOCAL_DB_CONFIG.password },
       stdio: ['ignore', 'pipe', 'pipe']
@@ -158,29 +138,22 @@ RESET maintenance_work_mem;
     
     let errorOutput = '';
     
-    psql.stderr.on('data', (data) => {
+    pgRestore.stderr.on('data', (data) => {
       errorOutput += data.toString();
     });
     
-    psql.on('close', (code) => {
-      // Clean up temporary file
-      try {
-        fs.unlinkSync(optimizedFile);
-      } catch (cleanupError) {
-        // Ignore cleanup errors
-      }
-      
+    pgRestore.on('close', (code) => {
       if (code === 0) {
         spinner.stop('✅ Data restoration completed');
         resolve();
       } else {
         spinner.fail('❌ Data restoration failed');
         console.error('Error details:', errorOutput || `Process exited with code ${code}`);
-        reject(new Error(`psql process exited with code ${code}`));
+        reject(new Error(`pg_restore process exited with code ${code}`));
       }
     });
     
-    psql.on('error', (error) => {
+    pgRestore.on('error', (error) => {
       spinner.fail('❌ Data restoration failed');
       console.error('Error details:', error.message);
       reject(error);
