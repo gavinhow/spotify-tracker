@@ -25,6 +25,10 @@ const ArtistNameAndPicture = async ({ artistId }: ArtistNameAndPictureProps) => 
       }
     }
   )
+
+  if (!data) {
+    return null;
+  }
   return (
     <div>
       <div className="text-2xl font-bold mb-3">

@@ -15,7 +15,7 @@ import {
   SidebarHeader,
   SidebarRail, SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { useSuspenseQuery } from '@apollo/client';
+import { useSuspenseQuery } from '@apollo/client/react';
 import { gql } from '@/__generated__';
 
 // This is sample data.

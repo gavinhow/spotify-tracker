@@ -1,35 +1,26 @@
-import type { ApolloQueryResult, OperationVariables } from '@apollo/client/core/types';
-import type { QueryOptions } from '@apollo/client/core/watchQueryOptions';
-import type { MaybeMasked } from '@apollo/client/masking';
-import { redirect } from 'next/navigation';
-import { getClient } from '@/lib/client';
-import { ApolloError, NetworkError } from '@apollo/client/errors';
-import { ServerError } from '@apollo/client';
+import type {OperationVariables, QueryOptions} from '@apollo/client';
+import {redirect} from 'next/navigation';
+import {getClient} from '@/lib/client';
+import type {ServerError} from '@apollo/client/errors';
 
 
-export async function AuthSafeQuery<T = unknown, TVariables extends OperationVariables = OperationVariables>(options: QueryOptions<TVariables, T>): Promise<ApolloQueryResult<MaybeMasked<T>>> {
-  let response: ApolloQueryResult<MaybeMasked<T>>;
+export async function AuthSafeQuery<T = unknown, TVariables extends OperationVariables = OperationVariables>(options: QueryOptions<TVariables, T>) {
   try {
-    response = await (await getClient()).query(options)
-
+    return await (await getClient()).query(options);
   } catch (error: unknown) {
-    if (isApolloError(error) && isServerError(error.networkError) && error.networkError.statusCode === 401)
+    // Check if error has networkError property and it's a 401
+    if (hasNetworkError(error) && isServerError(error.networkError) && error.networkError.statusCode === 401)
       redirect("/api/logout")
 
     throw error;
   }
-
-
-  return response;
-
-
 }
 
 
-function isApolloError(error: unknown): error is ApolloError {
-  return (error as ApolloError | undefined)?.networkError !== undefined;
+function hasNetworkError(error: unknown): error is { networkError: Error | undefined } {
+  return typeof error === 'object' && error !== null && 'networkError' in error;
 }
 
-function isServerError(networkError: NetworkError | undefined): networkError is ServerError{
+function isServerError(networkError: Error | undefined): networkError is ServerError{
   return (networkError as ServerError | undefined)?.statusCode !== undefined;
 }

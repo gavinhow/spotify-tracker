@@ -1,28 +1,30 @@
-import { HttpLink, InMemoryCache, ApolloClient, ApolloLink, ServerError } from '@apollo/client';
-import { registerApolloClient } from '@apollo/experimental-nextjs-app-support';
+import { HttpLink, ApolloLink } from '@apollo/client';
+import {
+  ApolloClient,
+  InMemoryCache,
+  registerApolloClient,
+} from '@apollo/client-integration-nextjs';
 import { getUserCookie } from '@/lib/getUserCookie';
-import { onError } from '@apollo/client/link/error';
-import { NetworkError } from '@apollo/client/errors';
+import { ErrorLink } from '@apollo/client/link/error';
+import { CombinedGraphQLErrors, ServerError } from '@apollo/client/errors';
 import { headers } from 'next/headers';
 
 
-const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
-  if (isServerError(networkError) && networkError.statusCode === 401) {
+const errorLink = new ErrorLink(({ error, operation, forward }) => {
+  // Check if error is a ServerError with status code 401
+  if (ServerError.is(error) && error.statusCode === 401) {
     // Handle 401: Redirect to login, refresh token, etc.
     // redirect("/")
   }
 
-  if (graphQLErrors) {
-    graphQLErrors.forEach(({ message, locations, path }) =>
+  // Check if error is a GraphQL error
+  if (CombinedGraphQLErrors.is(error)) {
+    error.errors.forEach(({ message, locations, path }) =>
       console.error(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`)
     );
   }
   return forward(operation)
 });
-
-function isServerError(networkError: NetworkError | undefined): networkError is ServerError {
-  return (networkError as ServerError).statusCode !== undefined;
-}
 
 export const { getClient } = registerApolloClient(async () => {
   const user = await getUserCookie();

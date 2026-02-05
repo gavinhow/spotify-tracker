@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { gql } from '@/__generated__';
 import { useWindowScroll } from '@uidotdev/usehooks';
-import { useSuspenseQuery } from '@apollo/client';
+import { useSuspenseQuery } from '@apollo/client/react';
 import { GlobalFilters } from '@/lib/GlobalFilters/GlobalFilters';
 import { TopSongsPageSearchParams } from '@/app/(authenticated)/top-songs/page';
 import { cn } from '@/lib/utils';

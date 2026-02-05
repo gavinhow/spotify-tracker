@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { gql } from '@/__generated__';
 import { useWindowScroll } from '@uidotdev/usehooks';
-import { useSuspenseQuery } from '@apollo/client';
 import { GlobalFilters } from '@/lib/GlobalFilters/GlobalFilters';
 import { TopSongsPageSearchParams } from '@/app/(authenticated)/top-songs/page';
 import { cn } from '@/lib/utils';
@@ -11,6 +10,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { SongRow, SongRowImage, SongRowPlayCount } from '@/components/ui/song-row';
 import { TopSongRowArtistDetails } from '@/components/dashboard/top-song-row';
 import LinkWithGlobalFilters from '../link-global-filters/link-global-filters';
+import { useSuspenseQuery } from '@apollo/client/react';
 
 
 const query = gql(/* GraphQL */`

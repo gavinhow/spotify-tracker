@@ -57,16 +57,16 @@ const TrackList = async ({
   })
 
 
-  const highestPlay = Math.max(...albumPlayData.topSongs?.edges?.map(track => track.node.playCount) ?? [])
+  const highestPlay = Math.max(...albumPlayData?.topSongs?.edges?.map(track => track.node.playCount) ?? [])
 
 
   return (
     <div className={cn('', className)} {...props}>
       <div className={'text-xl font-bold mb-3'}>Songs</div>
       <div className="grid">
-        {trackListData.album.tracks
+        {trackListData?.album.tracks
           .map(track => {
-            const playData = albumPlayData.topSongs?.edges?.find(x => x.node.trackId === track.id);
+            const playData = albumPlayData?.topSongs?.edges?.find(x => x.node.trackId === track.id);
 
             const playPercentage = playData ? (playData.node.playCount / highestPlay) * 100 : 0;
 

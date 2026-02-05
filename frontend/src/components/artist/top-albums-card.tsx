@@ -47,7 +47,7 @@ const TopAlbumsCard = async ({
     }
   });
 
-  if (!data.topAlbums?.edges || data.topAlbums?.edges?.length === 0) {
+  if (!data?.topAlbums?.edges || data.topAlbums?.edges?.length === 0) {
     return null;
   }
 

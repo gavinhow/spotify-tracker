@@ -2,6 +2,7 @@ import React from 'react';
 import { gql } from '@/__generated__';
 import UserSwitcherClient from '@/components/top-navbar/user-switcher-client';
 import { AuthSafeQuery } from '@/lib/authSafeQuery';
+import { GetMeAndFriendsQuery } from '@/__generated__/graphql';
 
 export const getMeQuery = gql(/* GraphQL */`
   query GetMeAndFriends {
@@ -23,7 +24,7 @@ const UserSwitcher = async () => {
   })
 
   return (
-    data && <UserSwitcherClient data={data}/>
+    data && <UserSwitcherClient data={data as GetMeAndFriendsQuery}/>
   );
 };
 

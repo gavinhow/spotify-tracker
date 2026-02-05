@@ -43,7 +43,7 @@ const TopSongsCard = async ({
     }
   });
 
-  if (!data.topSongs?.edges || data.topSongs?.edges?.length === 0) {
+  if (!data?.topSongs?.edges || data.topSongs?.edges?.length === 0) {
     return null;
   }
 

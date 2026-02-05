@@ -26,6 +26,11 @@ const AlbumNameAndPicture = async ({ trackId, user, from, to }: TrackPageParams 
       }
     }
   )
+
+  if(!data) {
+    return null;
+  }
+
   return (
     <div>
       <div className="text-2xl font-bold mb-3">

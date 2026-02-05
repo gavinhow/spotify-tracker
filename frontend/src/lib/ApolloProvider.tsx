@@ -1,29 +1,33 @@
 'use client';
 
-import { ApolloLink, HttpLink, ServerError } from '@apollo/client';
-import { onError } from '@apollo/client/link/error';
-import { NetworkError } from '@apollo/client/errors';
-import { ApolloNextAppProvider,InMemoryCache,  ApolloClient } from '@apollo/experimental-nextjs-app-support';
+import type { PropsWithChildren } from 'react';
+import { ApolloLink, HttpLink } from '@apollo/client';
+import { ErrorLink } from '@apollo/client/link/error';
+import { CombinedGraphQLErrors, ServerError } from '@apollo/client/errors';
+import {
+  ApolloClient,
+  ApolloNextAppProvider,
+  InMemoryCache,
+  SSRMultipartLink,
+} from '@apollo/client-integration-nextjs';
 import { useDemo } from '@/lib/DemoProvider/demo-provider-client';
 
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (isServerError(networkError) && networkError.statusCode === 401) {
+const errorLink = new ErrorLink(({ error, operation }) => {
+  // Check if error is a ServerError with status code 401
+  if (typeof window !== 'undefined' && ServerError.is(error) && error.statusCode === 401) {
     // Handle 401: Redirect to login, refresh token, etc.
     console.log('Unauthorised! Redirecting to login...');
     window.location.href = '/api/logout';
     return undefined;
   }
 
-  if (graphQLErrors) {
-    graphQLErrors.forEach(({ message, locations, path }) =>
+  // Check if error is a GraphQL error
+  if (CombinedGraphQLErrors.is(error)) {
+    error.errors.forEach(({ message, locations, path }) =>
       console.error(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`)
     );
   }
 });
-
-function isServerError(networkError: NetworkError | undefined): networkError is ServerError {
-  return (networkError as ServerError).statusCode !== undefined;
-}
 
 // have a function to create a client for you
 function makeClient(token: string | undefined, isDemo: boolean) {
@@ -46,9 +50,9 @@ function makeClient(token: string | undefined, isDemo: boolean) {
     // const { data } = useSuspenseQuery(MY_QUERY, { context: { fetchOptions: { cache: "force-cache" }}});
   });
 
-  // use the `ApolloClient` from "@apollo/experimental-nextjs-app-support"
+  // use the `ApolloClient` from "@apollo/client-integration-nextjs"
   return new ApolloClient({
-      // use the `InMemoryCache` from "@apollo/experimental-nextjs-app-support"
+      // use the `InMemoryCache` from "@apollo/client-integration-nextjs"
       cache: new InMemoryCache({
         typePolicies: {
           Query: {
@@ -100,7 +104,9 @@ function makeClient(token: string | undefined, isDemo: boolean) {
         }
       }),
       link:
-        ApolloLink.from([errorLink, httpLink]),
+        typeof window === 'undefined'
+          ? ApolloLink.from([new SSRMultipartLink({ stripDefer: true }), errorLink, httpLink])
+          : ApolloLink.from([errorLink, httpLink]),
     }
   )
     ;
@@ -111,7 +117,7 @@ interface ApolloWrapperProps {
 }
 
 // you need to create a component to wrap your app in
-export function ApolloWrapper({ children, user }: React.PropsWithChildren & ApolloWrapperProps) {
+export function ApolloWrapper({ children, user }: PropsWithChildren & ApolloWrapperProps) {
   const {isDemo} = useDemo();
   return (
     <ApolloNextAppProvider makeClient={() => makeClient(user?.token, isDemo)}>

@@ -29,12 +29,12 @@ const AlbumNameAndPicture = async ({ albumId }: AlbumNameAndPictureProps) => {
   return (
     <div>
       <div className="text-2xl font-bold mb-3">
-        {data.album.name}
+        {data?.album.name}
       </div>
       <Card className="shadow-none border-0 aspect-square w-full relative rounded-md overflow-hidden">
-        <img fetchPriority="high" className="absolute h-full w-full"  src={data.album.imageUrl} style={{
+        <img fetchPriority="high" className="absolute h-full w-full"  src={data?.album.imageUrl} style={{
           objectFit: 'cover',
-        }} alt={data.album.name}/>
+        }} alt={data?.album.name}/>
       </Card>
     </div>
   );

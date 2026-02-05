@@ -27,7 +27,11 @@ const AppearsOn = async ({ trackId }: TrackPageParams) => {
     },
   })
 
-  const album = data.track.album;
+  const album = data?.track.album;
+
+  if (!album) {
+    return null;
+  }
   return (
     <div>
       <div className={'text-xl font-bold mb-3'}>Appears on</div>

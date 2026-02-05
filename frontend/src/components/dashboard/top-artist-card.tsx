@@ -39,7 +39,7 @@ const TopArtistCard = async ({
     }
   });
 
-  const artists = data.topArtists?.edges ?? [];
+  const artists = data?.topArtists?.edges ?? [];
   const topArtist = artists.length > 0 ? artists?.[0].node: undefined;
   const name = topArtist?.artist.name;
   const imageUrl = topArtist?.artist.imageUrl;

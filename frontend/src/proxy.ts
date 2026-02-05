@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   // Check if the path starts with /demo
   if (req.nextUrl.pathname.startsWith('/demo')) {
     const url = req.nextUrl.clone();

@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { TopSongRowArtistDetails } from '@/components/dashboard/top-song-row';
 import { format } from 'date-fns';
 import { GetPlaysQuery } from '@/__generated__/graphql';
-import { useSuspenseQuery } from '@apollo/client';
+import { useSuspenseQuery } from '@apollo/client/react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ArrowUp, ChevronRight } from 'lucide-react';
 import { useWindowScroll } from '@uidotdev/usehooks';
@@ -62,7 +62,8 @@ const PlayHistory = ({ user, from, to }: GlobalFilters) => {
   const [lastCursor, setLastCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState<boolean>(false);
 
-  function flattenData(data: GetPlaysQuery, lastRenderedSectionDate?: string): ListItem[] {
+  function flattenData(data: GetPlaysQuery | undefined, lastRenderedSectionDate?: string): ListItem[] {
+    if (!data) return [];
     const flattened = [] as ListItem[];
     let tempLastCursor = lastCursor || null;
     let lastDate: string | undefined = lastRenderedSectionDate;
@@ -117,11 +118,12 @@ const PlayHistory = ({ user, from, to }: GlobalFilters) => {
             variables: {
               after: lastCursor
             }
-          }).then(results => {
+          }).then((results) => {
             const lastRenderedSectionDate = flattenedData
               .slice()
               .reverse()
               .find((entry) => entry.type === 'section')?.date;
+            if (!results.data) return;
             setFlattenedData((prev) => [...prev, ...flattenData(results.data, lastRenderedSectionDate)])
           })
         }}
