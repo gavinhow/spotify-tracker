@@ -10,6 +10,7 @@ using Gavinhow.SpotifyStatistics.Web.Authorization.Handler;
 using Gavinhow.SpotifyStatistics.Web.Authorization.Requirements;
 using Gavinhow.SpotifyStatistics.Web.BackgroundServices;
 using Gavinhow.SpotifyStatistics.Web.Extensions;
+using Gavinhow.SpotifyStatistics.Web.Observability;
 using Gavinhow.SpotifyStatistics.Logging;
 using Gavinhow.SpotifyStatistics.Web.Services;
 using Gavinhow.SpotifyStatistics.Web.Settings;
@@ -24,6 +25,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddStructuredLogging();
 
 builder.Services.UseHttpClientMetrics();
+
+var configuredServiceName = builder.Configuration["ServiceName"]
+    ?? builder.Configuration["SERVICE_NAME"]
+    ?? builder.Configuration["Service:Name"]
+    ?? "spotify-api";
+
+builder.Services.Configure<MetricsSettings>(builder.Configuration.GetSection("Metrics"));
+var metricsSettings = builder.Configuration.GetSection("Metrics").Get<MetricsSettings>() ?? new MetricsSettings();
+metricsSettings.ServiceName = string.IsNullOrWhiteSpace(metricsSettings.ServiceName)
+    ? configuredServiceName
+    : metricsSettings.ServiceName;
+
+builder.Services.AddSingleton(new QueueProcessingMetrics(metricsSettings.ServiceName));
 
 var corsSettings = builder.Configuration.GetSection("Cors").Get<CorsSettings>();
 if (corsSettings == null || corsSettings.AllowedOrigins.Length == 0)
@@ -160,7 +174,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapGraphQLHttp().RequireAuthorization("ApiKeyOrBearer");
 app.MapControllers();
-app.MapMetrics();
+app.MapMetrics(metricsSettings.Path).RequireHost(metricsSettings.AllowedHost);
 // Map health check endpoint
 app.MapHealthChecks("/health");
 

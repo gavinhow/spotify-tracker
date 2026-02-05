@@ -1,8 +1,10 @@
 using System.Text;
 using System.Text.Json;
+using System.Diagnostics;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
 using Gavinhow.SpotifyStatistics.Api.Models;
+using Gavinhow.SpotifyStatistics.Web.Observability;
 using Gavinhow.SpotifyStatistics.Web.Services;
 using Gavinhow.SpotifyStatistics.Web.Settings;
 using Microsoft.Extensions.Options;
@@ -15,17 +17,20 @@ public class QueueConsumerBackgroundService : BackgroundService
     private readonly IServiceProvider _serviceProvider;
     private readonly QueueSettings _settings;
     private readonly ILogger<QueueConsumerBackgroundService> _logger;
+    private readonly QueueProcessingMetrics _metrics;
 
     public QueueConsumerBackgroundService(
         QueueClient queueClient,
         IServiceProvider serviceProvider,
         IOptions<QueueSettings> settings,
-        ILogger<QueueConsumerBackgroundService> logger)
+        ILogger<QueueConsumerBackgroundService> logger,
+        QueueProcessingMetrics metrics)
     {
         _queueClient = queueClient;
         _serviceProvider = serviceProvider;
         _settings = settings.Value;
         _logger = logger;
+        _metrics = metrics;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -37,13 +42,26 @@ public class QueueConsumerBackgroundService : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
+            var runStopwatch = Stopwatch.StartNew();
+            var runStatus = "success";
+
             try
             {
                 await ProcessMessagesAsync(stoppingToken);
             }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                break;
+            }
             catch (Exception ex)
             {
+                runStatus = "failure";
                 _logger.LogError(ex, "Error processing queue messages");
+            }
+            finally
+            {
+                runStopwatch.Stop();
+                _metrics.RecordImportRunCompletion(runStatus, runStopwatch.Elapsed.TotalSeconds);
             }
 
             await Task.Delay(TimeSpan.FromSeconds(_settings.PollingIntervalSeconds), stoppingToken);
@@ -60,6 +78,16 @@ public class QueueConsumerBackgroundService : BackgroundService
             maxMessages: _settings.MaxMessagesPerPoll,
             visibilityTimeout: visibilityTimeout,
             cancellationToken: ct);
+
+        try
+        {
+            var properties = await _queueClient.GetPropertiesAsync(ct);
+            _metrics.SetQueueSize(properties.Value.ApproximateMessagesCount);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Failed to read queue properties for queue size metrics");
+        }
 
         if (messages.Length == 0)
         {
@@ -80,6 +108,7 @@ public class QueueConsumerBackgroundService : BackgroundService
                     _logger.LogWarning(
                         "Failed to deserialize message {MessageId}, dequeue count: {DequeueCount}",
                         message.MessageId, message.DequeueCount);
+                    _metrics.IncrementMessagesProcessed("skipped");
 
                     // After 5 failed attempts, Azure will move to poison queue automatically
                     // For now, just delete malformed messages

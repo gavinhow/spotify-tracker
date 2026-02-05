@@ -1,11 +1,11 @@
 meta {
-  name: Healthcheck
+  name: Test
   type: http
-  seq: 2
+  seq: 5
 }
 
 get {
-  url: {{BaseUrl}}/health
+  url: http://spotify-api.coolify.schrutefarms.home.arpa/health
   body: none
   auth: inherit
 }
