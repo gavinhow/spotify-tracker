@@ -13,7 +13,7 @@ function toSnakeCase(str: string): string {
  */
 function formatBindings() {
   return {
-    service: process.env.SERVICE_NAME || process.env.npm_package_name || 'frontend',
+    service: process.env.SERVICE_NAME || process.env.npm_package_name || 'spotify-web',
     environment: process.env.NODE_ENV || 'development',
   };
 }

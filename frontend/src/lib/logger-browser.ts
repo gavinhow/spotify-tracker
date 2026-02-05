@@ -30,7 +30,7 @@ function formatBrowserLog(
 ): Record<string, unknown> {
   const service =
     process.env.NEXT_PUBLIC_SERVICE_NAME ||
-    'frontend';
+    'spotify-frontend';
   const environment = process.env.NEXT_PUBLIC_ENV || process.env.NODE_ENV || 'development';
 
   const log: Record<string, unknown> = {

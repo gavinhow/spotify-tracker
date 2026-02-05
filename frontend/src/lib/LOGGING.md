@@ -6,6 +6,7 @@ This application uses [pino](https://getpino.io/) for structured logging with a 
 
 - [Quick Start](#quick-start)
 - [Server-Side Logging](#server-side-logging)
+- [Next.js Instrumentation Logging](#nextjs-instrumentation-logging)
 - [Client-Side Logging](#client-side-logging)
 - [API Route Middleware](#api-route-middleware)
 - [Log Format](#log-format)
@@ -55,6 +56,29 @@ logger.warn({ threshold: 90 }, 'Memory usage high');
 logger.error({ err: error }, 'Operation failed');
 logger.fatal({ err: error }, 'Critical system failure');
 ```
+
+## Next.js Instrumentation Logging
+
+This project uses Next.js instrumentation (`src/instrumentation.ts`) to route framework-level server logs into the existing pino logger.
+
+### What It Captures
+
+- Next/server `console.debug`, `console.info`, `console.warn`, and `console.error` output on the server runtime
+- Next request errors via the `onRequestError` instrumentation hook
+- Source tags for easier filtering:
+  - `source: "next_console"` for bridged console output
+  - `source: "next_instrumentation"` for instrumentation lifecycle and request error logs
+
+### What It Does Not Capture
+
+- Browser console logs from client components
+- Metrics exports (Prometheus/OpenTelemetry exporters)
+- Any logs emitted outside the server runtime
+
+### Dev vs Production Behavior
+
+- **Development**: Logs still flow through the same logger, and `pino-pretty` keeps output readable
+- **Production**: Logs are emitted as compact JSON to stdout with the same structured fields
 
 ### With HTTP Context
 
